@@ -1,0 +1,7 @@
+--2020-06-21 23:05:09--  https://docs.google.com/uc?export=download&id=1mtmpxvTACtvijV9E4jBKOXoDtPrnnsCw%20%20-O%20ISH_images%0Als%0Awget%20--no-check-certificate%20https://docs.google.com/uc?export=download
+Loaded CA certificate '/etc/ssl/certs/ca-certificates.crt'
+Resolving docs.google.com (docs.google.com)... 172.217.25.142, 2404:6800:4006:804::200e
+Connecting to docs.google.com (docs.google.com)|172.217.25.142|:443... connected.
+HTTP request sent, awaiting response... 404 Not Found
+2020-06-21 23:05:11 ERROR 404: Not Found.
+
