@@ -1,7 +1,6 @@
 import pandas as pd
 import xml.etree.ElementTree as ET
 
-
 def pd_to_quickNII(results, orientation='coronal', filename='Download'): ##converts a pandas DataFrame to a quickNII compatible XML
         ##Get the total number of sections
         num_of_sections = results.shape[0]
@@ -17,13 +16,14 @@ def pd_to_quickNII(results, orientation='coronal', filename='Download'): ##conve
             results = results.sort_values('oz')
         ##Explicitly confirm all filenames are Strings
         results['Filenames'] = results['Filenames'].astype(str)
+        df = results
         ##for each section append Oxyz, Uxyz and Vxyz parameters to the XML
         for i in range(num_of_sections):
             child = ET.SubElement(root, 'slice')
             child.attrib['filename'] =  df.iloc[i,0]  ##this is the filename in our results file
             root.attrib['name'] =       df.iloc[i,0]  ##so is this
             ##Organise our coordinates
-            ox,oy,oz,ux,uy,uz,vx,vy,vz = results.iloc[i,1:9]
+            ox,oy,oz,ux,uy,uz,vx,vy,vz = results.iloc[i,1:10]
             ##these next two values I believe are placeholders required by QuickNII.
             child.attrib["height"] = "700"
             child.attrib["width"] = "700"
