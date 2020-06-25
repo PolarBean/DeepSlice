@@ -99,8 +99,7 @@ class DeepSlice:
 
             rotated_sections.append(section)
             cross, k = plane_alignment.find_plane_equation(section)
-            print(plane_alignment.get_angle(section, cross, k, "DV"))
-            print(plane_alignment.get_angle(section, cross, k, "ML"))
+
             
         self.results = pd.DataFrame(rotated_sections, columns=self.columns)
         ##insert the section filenames into the pandas DataFrame
