@@ -8,14 +8,16 @@ import plane_alignment
 import pandas as pd
 import numpy as np
 
-
 class DeepSlice:
-    def __init__(self, weights=None):
+    def __init__(self, weights=None, web=True):
         self.weights = weights
+        self.web = web
 
-    def Build(self, xception_weights="xception_weights_tf_dim_ordering_tf_kernels.h5"):
+
+
+    def Build(self):
         # Download Xception architecture with weights pretrained on imagenet
-        DenseModel = Xception(include_top=True, weights=xception_weights)
+        DenseModel = Xception(include_top=True, weights='xception_weights_tf_dim_ordering_tf_kernels.h5')
         # remove the Dense Softmax layer and average pooling layer from the pretrained model
         DenseModel._layers.pop()
         DenseModel._layers.pop()
@@ -24,11 +26,11 @@ class DeepSlice:
         model.add(DenseModel)
         # we tested various sizes for these last two layers but consistently found that 256 performed best for some unknown reason.
         # theoretically larger layers should be better able to fit the training set but this is not what we saw.
-        model.add(Dense(256, activation="relu"))
-        model.add(Dense(256, activation="relu"))
+        model.add(Dense(256, activation='relu'))
+        model.add(Dense(256, activation='relu'))
         # as we are predicting continuous values, here we define 9 output neurons with linear activation functions,
         # each corresponding to one of the QuickNII alignment variables Oxyz, Uxyz, Vxyz.
-        model.add(Dense(9, activation="linear"))
+        model.add(Dense(9, activation='linear'))
         if self.weights != None:
             # load weights
             model.load_weights(self.weights)
@@ -38,27 +40,24 @@ class DeepSlice:
         # Downsamples images too 299 x 299
         # converts images to grayscale
         img = color.rgb2gray(img).reshape(299, 299, 1)
-        return img
+        return (img)
 
-    def predict(self, image_dir):  ##input
+
+
+
+    def predict(self,image_dir):##input
         ##define_image_generator
-        self.Image_generator = ImageDataGenerator(
-            preprocessing_function=self.gray_scale, samplewise_std_normalization=True
-        ).flow_from_directory(
-            image_dir,
-            target_size=(299, 299),
-            batch_size=1,
-            color_mode="rgb",
-            shuffle=False,
-        )
+        self.Image_generator = (ImageDataGenerator(preprocessing_function=self.gray_scale, samplewise_std_normalization=True)
+                           .flow_from_directory(image_dir,
+                                                target_size=(299, 299),
+                                                batch_size=1,
+                                                color_mode='rgb',
+                                                shuffle=False))
         ##reset the image generator to ensure it starts from the first image
         self.Image_generator.reset()
         ##feed images to the model and store the predicted parameters
-        preds = self.model.predict(
-            self.Image_generator,
-            steps=self.Image_generator.n // self.Image_generator.batch_size,
-            verbose=1,
-        )
+        preds = self.model.predict(self.Image_generator,
+                              steps=self.Image_generator.n // self.Image_generator.batch_size, verbose=1)
         # convert the parameter values to floating point digits
         preds = preds.astype(float)
         # define the column names
@@ -66,7 +65,10 @@ class DeepSlice:
         ##create a pandas DataFrame of the parameter values
         results = pd.DataFrame(preds, columns=self.columns)
         ##insert the section filenames into the pandas DataFrame
-        results["Filenames"] = self.Image_generator.filenames[: results.shape[0]]
+        results["Filenames"] = self.Image_generator.filenames[:results.shape[0]]
+        ##This line is for compatibility with the website
+        if self.web == True:
+            results["Filenames"] = results["Filenames"].str.split('/')[1]
         ordered_cols = ["Filenames"] + self.columns
         self.results = results[ordered_cols]  # To get the same column order
         self.propagate_angles()
@@ -75,12 +77,10 @@ class DeepSlice:
         DV = []
         ML = []
         for prediction in self.results.iterrows():
-            m = prediction[1][
-                ["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]
-            ].values.astype(np.float64)
+            m = prediction[1][['ox', 'oy', 'oz', 'ux', 'uy', 'uz', 'vx', 'vy', 'vz']].values.astype(np.float64)
             cross, k = plane_alignment.find_plane_equation(m)
-            DV.append(plane_alignment.get_angle(m, cross, k, "DV"))
-            ML.append(plane_alignment.get_angle(m, cross, k, "ML"))
+            DV.append(plane_alignment.get_angle(m, cross, k, 'DV'))
+            ML.append(plane_alignment.get_angle(m, cross, k, 'ML'))
         DV = sorted(DV, key=abs)
         ML = sorted(ML, key=abs)
         len_75 = int(len(ML) * 0.75)
@@ -90,26 +90,14 @@ class DeepSlice:
         for section in self.results.iterrows():
             section = section[1][self.columns].values
             for i in range(4):
-                section = plane_alignment.Section_adjust(
-                    section, mean=DV_mean, direction="DV"
-                )
-                section = plane_alignment.Section_adjust(
-                    section, mean=ML_mean, direction="ML"
-                )
+                section = plane_alignment.Section_adjust(section, mean=DV_mean, direction='DV')
+                section = plane_alignment.Section_adjust(section, mean=ML_mean, direction='ML')
 
             rotated_sections.append(section)
             cross, k = plane_alignment.find_plane_equation(section)
-
-            
-        self.results = pd.DataFrame(rotated_sections, columns=self.columns)
-        ##insert the section filenames into the pandas DataFrame
-        self.results["Filenames"] = self.Image_generator.filenames[
-            : self.results.shape[0]
-        ]
-        ordered_cols = ["Filenames"] + self.columns
-        self.results = self.results[ordered_cols]  # To get the same column order
+            print(plane_alignment.get_angle(section, cross, k, 'DV'))
+            print(plane_alignment.get_angle(section, cross, k, 'ML'))
+        self.results = rotated_sections
 
     def Save_Results(self, filename):
-        pd_to_quickNII(
-            results=self.results, orientation="coronal", filename=str(filename)
-        )
+        pd_to_quickNII(results=self.results, orientation='coronal', filename=str(filename))
