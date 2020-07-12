@@ -7,17 +7,20 @@ from QuickNII_functions import pd_to_quickNII
 import plane_alignment
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import HuberRegressor
+from scipy.stats import trim_mean
+from statistics import mean
+
 
 class DeepSlice:
-    def __init__(self, weights=None, web=True):
+    def __init__(self, weights=None, web=False):
         self.weights = weights
         self.web = web
 
-
-
     def Build(self):
         # Download Xception architecture with weights pretrained on imagenet
-        DenseModel = Xception(include_top=True, weights='xception_weights_tf_dim_ordering_tf_kernels.h5')
+        DenseModel = Xception(
+            include_top=True, weights='xception_weights_tf_dim_ordering_tf_kernels.h5')
         # remove the Dense Softmax layer and average pooling layer from the pretrained model
         DenseModel._layers.pop()
         DenseModel._layers.pop()
@@ -42,62 +45,90 @@ class DeepSlice:
         img = color.rgb2gray(img).reshape(299, 299, 1)
         return (img)
 
-
-
-
-    def predict(self,image_dir):##input
-        ##define_image_generator
+    def predict(self, image_dir, huber=False, prop_angles=True):  # input
+        # define_image_generator
         self.Image_generator = (ImageDataGenerator(preprocessing_function=self.gray_scale, samplewise_std_normalization=True)
-                           .flow_from_directory(image_dir,
-                                                target_size=(299, 299),
-                                                batch_size=1,
-                                                color_mode='rgb',
-                                                shuffle=False))
-        ##reset the image generator to ensure it starts from the first image
+                                .flow_from_directory(image_dir,
+                                                     target_size=(299, 299),
+                                                     batch_size=1,
+                                                     color_mode='rgb',
+                                                     shuffle=False))
+        # reset the image generator to ensure it starts from the first image
         self.Image_generator.reset()
-        ##feed images to the model and store the predicted parameters
+        # feed images to the model and store the predicted parameters
         preds = self.model.predict(self.Image_generator,
-                              steps=self.Image_generator.n // self.Image_generator.batch_size, verbose=1)
+                                   steps=self.Image_generator.n // self.Image_generator.batch_size, verbose=1)
         # convert the parameter values to floating point digits
         preds = preds.astype(float)
         # define the column names
         self.columns = ["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]
-        ##create a pandas DataFrame of the parameter values
+        # create a pandas DataFrame of the parameter values
         results = pd.DataFrame(preds, columns=self.columns)
-        ##insert the section filenames into the pandas DataFrame
+        # insert the section filenames into the pandas DataFrame
         results["Filenames"] = self.Image_generator.filenames[:results.shape[0]]
-        ##This line is for compatibility with the website
+        # This line is for compatibility with the website
         if self.web == True:
             results["Filenames"] = results["Filenames"].str.split('/')[1]
         ordered_cols = ["Filenames"] + self.columns
         self.results = results[ordered_cols]  # To get the same column order
-        self.propagate_angles()
+        if prop_angles:
+            self.propagate_angles(huber)
 
-    def propagate_angles(self):
+    def propagate_angles(self, huber=True):
         DV = []
         ML = []
+        oy = []
         for prediction in self.results.iterrows():
-            m = prediction[1][['ox', 'oy', 'oz', 'ux', 'uy', 'uz', 'vx', 'vy', 'vz']].values.astype(np.float64)
+            m = prediction[1][['ox', 'oy', 'oz', 'ux', 'uy',
+                               'uz', 'vx', 'vy', 'vz']].values.astype(np.float64)
+            oy.append(m[1])
             cross, k = plane_alignment.find_plane_equation(m)
             DV.append(plane_alignment.get_angle(m, cross, k, 'DV'))
             ML.append(plane_alignment.get_angle(m, cross, k, 'ML'))
-        DV = sorted(DV, key=abs)
-        ML = sorted(ML, key=abs)
-        len_75 = int(len(ML) * 0.75)
-        DV_mean = np.mean(DV[-len_75:])
-        ML_mean = np.mean(ML[-len_75:])
+        if huber == True:
+            oy = np.array(oy).reshape(-1, 1)
+            # we use a huberised linear regressor as it is more robust to outliers
+            huber_regressor = HuberRegressor().fit(oy, DV)
+            # for our predictions we multiple the depth by the coefficient and add the y intercept
+            prop_DV = (huber_regressor.coef_ * oy) + huber_regressor.intercept_
+            huber_regressor = HuberRegressor().fit(oy, ML)
+            prop_ML = (huber_regressor.coef_ * oy) + huber_regressor.intercept_
+        else:
+            length = len(DV)
+            weights = plane_alignment.make_gaussian_weights(0, 528)
+            weights = [weights[int(y)] for y in oy]
+            # DV = sorted(DV, key=abs)[int(length*0.75):]
+            # ML = sorted(ML, key=abs)[int(length*0.75):]
+            print(weights)
+            prop_DV = [np.average(DV, weights=np.array(weights))] * length
+            prop_ML = [np.average(ML, weights=np.array(weights))] * length
+
         rotated_sections = []
+        count = 0
         for section in self.results.iterrows():
             section = section[1][self.columns].values
-            for i in range(4):
-                section = plane_alignment.Section_adjust(section, mean=DV_mean, direction='DV')
-                section = plane_alignment.Section_adjust(section, mean=ML_mean, direction='ML')
+            for i in range(10):
+                cross, k = plane_alignment.find_plane_equation(section)
+
+                section = plane_alignment.Section_adjust(
+                    section, mean=prop_DV[count], direction='DV')
+
+                section = plane_alignment.Section_adjust(
+                    section, mean=prop_ML[count], direction='ML')
 
             rotated_sections.append(section)
             cross, k = plane_alignment.find_plane_equation(section)
-            print(plane_alignment.get_angle(section, cross, k, 'DV'))
-            print(plane_alignment.get_angle(section, cross, k, 'ML'))
-        self.results = rotated_sections
+
+            count += 1
+        results = pd.DataFrame(rotated_sections, columns=self.columns)
+        # insert the section filenames into the pandas DataFrame
+        results["Filenames"] = self.Image_generator.filenames[:results.shape[0]]
+        # This line is for compatibility with the website
+        if self.web == True:
+            results["Filenames"] = results["Filenames"].str.split('/')[1]
+        ordered_cols = ["Filenames"] + self.columns
+        self.results = results[ordered_cols]  # To get the same column order
 
     def Save_Results(self, filename):
-        pd_to_quickNII(results=self.results, orientation='coronal', filename=str(filename))
+        pd_to_quickNII(results=self.results,
+                       orientation='coronal', filename=str(filename))
