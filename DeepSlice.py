@@ -13,14 +13,15 @@ from statistics import mean
 
 
 class DeepSlice:
-    def __init__(self, weights=None, web=False):
+    def __init__(self, weights=None, web=False, folder_name=None):
         self.weights = weights
         self.web = web
+        self.folder_name = folder_name
 
-    def Build(self):
+    def Build(self, xception_weights='xception_weights_tf_dim_ordering_tf_kernels.h5'):
         # Download Xception architecture with weights pretrained on imagenet
         DenseModel = Xception(
-            include_top=True, weights='xception_weights_tf_dim_ordering_tf_kernels.h5')
+            include_top=True, weights=xception_weights)
         # remove the Dense Softmax layer and average pooling layer from the pretrained model
         DenseModel._layers.pop()
         DenseModel._layers.pop()
@@ -66,9 +67,6 @@ class DeepSlice:
         results = pd.DataFrame(preds, columns=self.columns)
         # insert the section filenames into the pandas DataFrame
         results["Filenames"] = self.Image_generator.filenames[:results.shape[0]]
-        # This line is for compatibility with the website
-        if self.web == True:
-            results["Filenames"] = results["Filenames"].str.split('/')[1]
         ordered_cols = ["Filenames"] + self.columns
         self.results = results[ordered_cols]  # To get the same column order
         if prop_angles:
@@ -123,12 +121,9 @@ class DeepSlice:
         results = pd.DataFrame(rotated_sections, columns=self.columns)
         # insert the section filenames into the pandas DataFrame
         results["Filenames"] = self.Image_generator.filenames[:results.shape[0]]
-        # This line is for compatibility with the website
-        if self.web == True:
-            results["Filenames"] = results["Filenames"].str.split('/')[1]
         ordered_cols = ["Filenames"] + self.columns
         self.results = results[ordered_cols]  # To get the same column order
 
     def Save_Results(self, filename):
         pd_to_quickNII(results=self.results,
-                       orientation='coronal', filename=str(filename))
+                       orientation='coronal', filename=str(filename), web=self.web, folder_name=self.folder_name)
