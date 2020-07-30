@@ -3,7 +3,11 @@ import xml.etree.ElementTree as ET
 
 
 # converts a pandas DataFrame to a quickNII compatible XML
-def pd_to_quickNII(results, orientation='coronal', filename='Download'):
+def pd_to_quickNII(results, orientation='coronal', filename='Download', web=False, folder_name=None):
+    
+    # Replace the subfolder present in results if we are running for the web
+    if web and folder_name:
+        results["Filenames"] = results["Filenames"].str.replace(folder_name, '').str.replace('\\', '')
     # Get the total number of sections
     num_of_sections = results.shape[0]
     # Create the XML structure
