@@ -1,7 +1,7 @@
 import pandas as pd
 import xml.etree.ElementTree as ET
-
-
+from tqdm import tqdm
+import re
 # converts a pandas DataFrame to a quickNII compatible XML
 def pd_to_quickNII(results, orientation='coronal', filename='Download', web=False, folder_name=None):
     
@@ -23,7 +23,7 @@ def pd_to_quickNII(results, orientation='coronal', filename='Download', web=Fals
     # Explicitly confirm all filenames are Strings
     results['Filenames'] = results['Filenames'].astype(str)
     # for each section append Oxyz, Uxyz and Vxyz parameters to the XML
-    for i in range(num_of_sections):
+    for i in tqdm(range(num_of_sections)):
         child = ET.SubElement(root, 'slice')
         # this is the filename in our results file
         child.attrib['filename'] = results.iloc[i, 0]
