@@ -7,7 +7,7 @@ def pd_to_quickNII(results, orientation='coronal', filename='Download', web=Fals
     
     # Replace the subfolder present in results if we are running for the web
     if web and folder_name:
-        results["Filenames"] = results["Filenames"].str.replace(folder_name, '').str.replace('\\', '')
+        results["Filenames"] = results["Filenames"].str.replace(folder_name, '').str.replace('\\', '').str.replace('/', '')
     # Get the total number of sections
     num_of_sections = results.shape[0]
     # Create the XML structure
