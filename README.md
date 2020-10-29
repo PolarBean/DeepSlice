@@ -6,11 +6,11 @@ DeepSlice requires no preprocessing and works on any stain, however we have foun
 At present one limitation is that it only works on Coronally cut sections, we will release an update in the future for sagittal and horizontally cut histology.
 ## Web Application
 If you would like to use DeepSlice but don't need your own personal installation, check out [**DeepSlice Online**](www.DeepSlice.com.au), a fully functional web application which will allow you to upload your dataset and download the aligned results. The web interface was developed by [Michael Pegios](https://github.com/ThermoDev/).
-## [Installation: how to install DeepSlice](docs/installation.md)
+## [Installation: How to install DeepSlice](docs/installation.md)
 
-## [Usage: how to align using DeepSlice](docs/usage.md)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PolarBean/DeepSlice/blob/master/example_notebooks/DeepSlice_example.ipynb)
+## [Usage: How to align using DeepSlice](docs/usage.md)
 For a quick example using google colab, view our notebook here! 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PolarBean/DeepSlice/blob/master/example_notebooks/DeepSlice_example.ipynb)
 
 **Happy Aligning :)**
 
