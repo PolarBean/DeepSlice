@@ -1,4 +1,4 @@
-name: tensorflow
+name: DLC-CPU
 channels:
   - defaults
 dependencies:
