@@ -41,7 +41,7 @@ In this parent directory there should be only one sub folder, in this example th
 Model.predict('parent_dir/')                                                                  
 Model.Save_Results('output_filename')  
 ```                                                                                                                      
-This will produce an XML file which can be placed in "parent_dir" and then opened with QuickNII. 
+This will produce an XML file which can be placed in your brain folder and then opened with QuickNII. 
 
 ## Advanced Usage
 
