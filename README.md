@@ -7,7 +7,7 @@ At present one limitation is that it only works on Coronally cut sections, we wi
 ![Alt](docs/process.PNG) 
 DeepSlice automates the process of identifying exactly where in the brain a section lies, it can accomodate non-orthogonal cutting planes and will produce an image specific annotation for each section in your brain.   
 ## Web Application
-If you would like to use DeepSlice but don't need your own personal installation, check out [**DeepSlice Flask**](www.DeepSlice.com.au), a fully functional web application which will allow you to upload your dataset and download the aligned results. The web interface was developed by [Michael Pegios](https://github.com/ThermoDev/).
+If you would like to use DeepSlice but don't need your own personal installation, check out [**DeepSlice Flask**](https://www.DeepSlice.com.au), a fully functional web application which will allow you to upload your dataset and download the aligned results. The web interface was developed by [Michael Pegios](https://github.com/ThermoDev/).
 ## [Installation: How to install DeepSlice](docs/installation.md)
 
 ## [Usage: How to align using DeepSlice](docs/usage.md)
