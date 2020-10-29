@@ -12,7 +12,7 @@ If you would like to use DeepSlice but don't need your own personal installation
 
 ## [Usage: how to align using DeepSlice](docs/usage.md)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PolarBean/DeepSlice/blob/master/example_notebooks/DeepSlice_example.ipynb)
-For a quick example using google colab view our notebook here! 
+For a quick example using google colab, view our notebook here! 
 
 **Happy Aligning :)**
 
