@@ -3,8 +3,8 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense
 from skimage import color, transform
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from QuickNII_functions import pd_to_quickNII
-import plane_alignment
+from utilities.QuickNII_functions import pd_to_quickNII
+from utilities import plane_alignment
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import HuberRegressor
@@ -13,12 +13,12 @@ from statistics import mean
 
 
 class DeepSlice:
-    def __init__(self, weights=None, web=False, folder_name=None):
+    def __init__(self, weights='NN_weights/Synthetic_data_final.hdf5', web=False, folder_name=None):
         self.weights = weights
         self.web = web
         self.folder_name = folder_name
 
-    def Build(self, xception_weights='xception_weights_tf_dim_ordering_tf_kernels.h5'):
+    def Build(self, xception_weights='NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5'):
         # Download Xception architecture with weights pretrained on imagenet
         DenseModel = Xception(
             include_top=True, weights=xception_weights)
