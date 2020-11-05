@@ -1,4 +1,4 @@
-name: DLC-CPU
+name: DS-CPU
 channels:
   - defaults
 dependencies:
