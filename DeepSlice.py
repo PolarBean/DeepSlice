@@ -10,7 +10,24 @@ import numpy as np
 from sklearn.linear_model import HuberRegressor
 from scipy.stats import trim_mean
 from statistics import mean
+import re
 
+def ideal_spacing(pred_oy, section_numbers, section_thickness_um):
+    pred_oy = np.float64(pred_oy)
+    section_numbers = np.float64(section_numbers.values)
+    section_thickness_um = np.float64(section_thickness_um)
+    pred_um = pred_oy * 25
+    section_um = section_numbers * section_thickness_um
+    avg_dist = np.mean(pred_um - section_um)
+    return ((section_um+avg_dist))/25    
+
+def calculate_brain_center_depth(section):
+    cross, k = plane_alignment.find_plane_equation(section)
+    translated_volume = np.array((456, 0, 320))
+    linear_point = (
+        ((translated_volume[0] / 2) * cross[0]) + ((translated_volume[2] / 2) * cross[2])) + k
+    depth = -(linear_point / cross[1])
+    return depth
 
 class DeepSlice:
     def __init__(self, weights='NN_weights/Synthetic_data_final.hdf5', web=False, folder_name=None):
@@ -45,7 +62,7 @@ class DeepSlice:
         # converts images to grayscale
         img = color.rgb2gray(img).reshape(299, 299, 1)
         return (img)
-
+    
     def predict(self, image_dir, huber=False, prop_angles=True):  # input
         # define_image_generator
         self.Image_generator = (ImageDataGenerator(preprocessing_function=self.gray_scale, samplewise_std_normalization=True)
@@ -71,6 +88,28 @@ class DeepSlice:
         self.results = results[ordered_cols]  # To get the same column order
         if prop_angles:
             self.propagate_angles(huber)
+
+
+    def even_spacing(self, section_number_pattern, section_thickness_um):
+        ###This function takes a dataset with section numbers and spaces those sections based on their numbers
+        section_numbers = []
+        for Filename in self.results.Filenames.values:
+            section_number = re.search(str(section_number_pattern), Filename)
+            ###find the first appearance of the specified pattern
+            section_number = section_number.group(0)
+            ###remove non-numeric characters
+            section_number = re.sub("[^0-9]", "", section_number)
+            section_numbers.append(section_number)
+
+
+
+        self.results['section_ID'] = section_numbers
+        self.results.section_ID = self.results.section_ID.astype(np.float64)
+        depth = []
+        for section in self.results[self.columns].values:
+            depth.append((calculate_brain_center_depth(section)))
+        ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um)
+        self.results.oy-=(depth-ideal)
 
     def propagate_angles(self, huber=True):
         DV = []
