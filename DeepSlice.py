@@ -1,3 +1,12 @@
+
+##very janky way to solve relative import problem
+import os
+from pathlib import Path
+##set path to be the DeepSlice directory
+path = str(Path(__file__).parent) 
+
+os.chdir(path)
+print(path)
 from tensorflow.keras.applications.xception import Xception
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense
@@ -39,12 +48,13 @@ def calculate_brain_center_depth(section):
     return depth
 
 class DeepSlice:
-    def __init__(self, weights='NN_weights/Synthetic_data_final.hdf5', web=False, folder_name=None):
+    def __init__(self, weights=path+'/NN_weights/Synthetic_data_final.hdf5', web=False, folder_name=None):
+        print("weights are: {}".format(weights))
         self.weights = weights
         self.web = web
         self.folder_name = folder_name
 
-    def Build(self, xception_weights='NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5'):
+    def Build(self, xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5'):
         # Download Xception architecture with weights pretrained on imagenet
         DenseModel = Xception(
             include_top=True, weights=xception_weights)
