@@ -12,6 +12,15 @@ from scipy.stats import trim_mean
 from statistics import mean
 import re
 
+def ideal_thickness(results, depth):
+    number_spacing = np.float64(results['section_ID'].values[1:]) - np.float64(results['section_ID'].values[:-1])
+    depth_spacing = (np.array(depth)[:-1] - np.array(depth)[1:])
+    predicted_thickness = np.mean(depth_spacing/number_spacing) * 25
+    thickness_variability = np.std(depth_spacing/number_spacing) * 25
+    print("Your sections appear to be sectioned at {0:.4f} micron thickness".format(np.abs(predicted_thickness)))
+    print("the variability of thickness is {0:.4f} microns".format(thickness_variability))
+    return predicted_thickness
+
 def ideal_spacing(pred_oy, section_numbers, section_thickness_um):
     pred_oy = np.float64(pred_oy)
     section_numbers = np.float64(section_numbers.values)
@@ -90,7 +99,7 @@ class DeepSlice:
             self.propagate_angles(huber)
 
 
-    def even_spacing(self, section_number_pattern, section_thickness_um):
+    def even_spacing(self, section_number_pattern, section_thickness_um=None):
         ###This function takes a dataset with section numbers and spaces those sections based on their numbers
         section_numbers = []
         for Filename in self.results.Filenames.values:
@@ -102,12 +111,24 @@ class DeepSlice:
             section_numbers.append(section_number)
 
 
-
         self.results['section_ID'] = section_numbers
         self.results.section_ID = self.results.section_ID.astype(np.float64)
+        print(self.results.section_ID)
         depth = []
         for section in self.results[self.columns].values:
             depth.append((calculate_brain_center_depth(section)))
+        
+        estimate_thickness = ideal_thickness(self.results, depth)
+        if estimate_thickness<0:
+            print("the sections are NOT numbered rostrocaudaly... not a problem we will adjust")
+            self.results.section_ID = (self.results.section_ID.max() - self.results.section_ID)
+        else:
+            print("the sections are numbered rostrocaudaly")
+
+
+        if section_thickness_um==None:
+                section_thickness_um = estimate_thickness
+
         ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um)
         self.results.oy-=(depth-ideal)
 
