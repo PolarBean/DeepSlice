@@ -48,13 +48,11 @@ def calculate_brain_center_depth(section):
     return depth
 
 class DeepSlice:
-    def __init__(self, weights=path+'/NN_weights/Synthetic_data_final.hdf5', web=False, folder_name=None):
-        print("weights are: {}".format(weights))
-        self.weights = weights
+    def __init__(self, web=False, folder_name=None):
         self.web = web
         self.folder_name = folder_name
 
-    def Build(self, xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5'):
+    def init_model(self, DS_weights, xception_weights):
         # Download Xception architecture with weights pretrained on imagenet
         DenseModel = Xception(
             include_top=True, weights=xception_weights)
@@ -71,10 +69,19 @@ class DeepSlice:
         # as we are predicting continuous values, here we define 9 output neurons with linear activation functions,
         # each corresponding to one of the QuickNII alignment variables Oxyz, Uxyz, Vxyz.
         model.add(Dense(9, activation='linear'))
-        if self.weights != None:
+        if DS_weights != None:
             # load weights
-            model.load_weights(self.weights)
-        self.model = model
+            model.load_weights(DS_weights)
+        return model
+
+    def Build(self,test=[], DS_weights = path+'/NN_weights/Synthetic_data_final.hdf5',\
+         xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5',
+              wise=False, wise_weights=path+'/NN_weights/Allen_Mixed_Best.h5'):
+        self.model1 = self.init_model(DS_weights=DS_weights, xception_weights=xception_weights)
+        if wise:
+            self.model2 = self.init_model(DS_weights= wise_weights, xception_weights=xception_weights)
+
+
 
     def gray_scale(self, img):
         # Downsamples images too 299 x 299
@@ -82,7 +89,7 @@ class DeepSlice:
         img = color.rgb2gray(img).reshape(299, 299, 1)
         return (img)
     
-    def predict(self, image_dir, huber=False, prop_angles=True):  # input
+    def predict(self, image_dir, prop_angles=True, huber=False, wise=False):  # input
         # define_image_generator
         self.Image_generator = (ImageDataGenerator(preprocessing_function=self.gray_scale, samplewise_std_normalization=True)
                                 .flow_from_directory(image_dir,
@@ -93,10 +100,15 @@ class DeepSlice:
         # reset the image generator to ensure it starts from the first image
         self.Image_generator.reset()
         # feed images to the model and store the predicted parameters
-        preds = self.model.predict(self.Image_generator,
+        preds = self.model1.predict(self.Image_generator,
                                    steps=self.Image_generator.n // self.Image_generator.batch_size, verbose=1)
         # convert the parameter values to floating point digits
         preds = preds.astype(float)
+        if wise:
+            wise_preds = self.model2.predict(self.Image_generator,
+                                   steps=self.Image_generator.n // self.Image_generator.batch_size, verbose=1)
+            preds = np.mean((preds, wise_preds), axis=0)
+
         # define the column names
         self.columns = ["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]
         # create a pandas DataFrame of the parameter values
@@ -107,6 +119,7 @@ class DeepSlice:
         self.results = results[ordered_cols]  # To get the same column order
         if prop_angles:
             self.propagate_angles(huber)
+
 
 
     def even_spacing(self, section_thickness_um=None):
