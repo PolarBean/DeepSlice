@@ -74,7 +74,7 @@ class DeepSlice:
             model.load_weights(DS_weights)
         return model
 
-    def Build(self,test=[], DS_weights = path+'/NN_weights/Synthetic_data_final.hdf5',\
+    def Build(self,DS_weights = path+'/NN_weights/Synthetic_data_final.hdf5',\
          xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5',
               wise=False, wise_weights=path+'/NN_weights/Allen_Mixed_Best.h5'):
         self.model1 = self.init_model(DS_weights=DS_weights, xception_weights=xception_weights)
