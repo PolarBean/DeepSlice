@@ -109,15 +109,16 @@ class DeepSlice:
             self.propagate_angles(huber)
 
 
-    def even_spacing(self, section_number_pattern, section_thickness_um=None):
+    def even_spacing(self, section_thickness_um=None):
         ###This function takes a dataset with section numbers and spaces those sections based on their numbers
         section_numbers = []
         for Filename in self.results.Filenames.values:
-            section_number = re.search(str(section_number_pattern), Filename)
+            ##this removes all non-numeric characters
+            section_number = re.sub("[^0-9]", "", Filename)
+            ###this gets the three numbers closest to the end
+            section_number = section_number[-3:]
             ###find the first appearance of the specified pattern
-            section_number = section_number.group(0)
             ###remove non-numeric characters
-            section_number = re.sub("[^0-9]", "", section_number)
             section_numbers.append(section_number)
 
 
