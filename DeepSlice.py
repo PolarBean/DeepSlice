@@ -117,24 +117,25 @@ class DeepSlice:
             section_number = re.sub("[^0-9]", "", Filename)
             ###this gets the three numbers closest to the end
             section_number = section_number[-3:]
-            ###find the first appearance of the specified pattern
+            ###find the first appearancex of the specified pattern
             ###remove non-numeric characters
             section_numbers.append(section_number)
 
 
         self.results['section_ID'] = section_numbers
         self.results.section_ID = self.results.section_ID.astype(np.float64)
-        print(self.results.section_ID)
+        self.results = self.results.sort_values('section_ID', ascending=False)
+
         depth = []
         for section in self.results[self.columns].values:
             depth.append((calculate_brain_center_depth(section)))
         
         estimate_thickness = ideal_thickness(self.results, depth)
         if estimate_thickness<0:
-            print("the sections are NOT numbered rostrocaudaly... not a problem we will adjust")
-            self.results.section_ID = (self.results.section_ID.max() - self.results.section_ID)
+            print("the sections are not numbered rostrocaudaly")
         else:
             print("the sections are numbered rostrocaudaly")
+            self.results.section_ID = (self.results.section_ID.max() - self.results.section_ID)
 
 
         if section_thickness_um==None:
@@ -176,6 +177,7 @@ class DeepSlice:
         count = 0
         for section in self.results.iterrows():
             section = section[1][self.columns].values
+            original_depth = calculate_brain_center_depth(section)
             for i in range(10):
                 cross, k = plane_alignment.find_plane_equation(section)
 
@@ -184,9 +186,13 @@ class DeepSlice:
 
                 section = plane_alignment.Section_adjust(
                     section, mean=prop_ML[count], direction='ML')
-
+            rotated_depth = calculate_brain_center_depth(section)
+            movement = rotated_depth - original_depth
+            section[1] -= movement
             rotated_sections.append(section)
             cross, k = plane_alignment.find_plane_equation(section)
+            final_depth = calculate_brain_center_depth(section)
+            # print(" original: {} \n rotated {} \n corrected {} \n".format(original_depth, rotated_depth, final_depth))
 
             count += 1
         results = pd.DataFrame(rotated_sections, columns=self.columns)
