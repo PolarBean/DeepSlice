@@ -1,12 +1,14 @@
 
 ##very janky way to solve relative import problem
 import os
+
 from pathlib import Path
 ##set path to be the DeepSlice directory
 path = str(Path(__file__).parent) 
 
 os.chdir(path)
 print(path)
+import warnings
 from tensorflow.keras.applications.xception import Xception
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense
@@ -36,7 +38,12 @@ def ideal_spacing(pred_oy, section_numbers, section_thickness_um):
     section_thickness_um = np.float64(section_thickness_um)
     pred_um = pred_oy * 25
     section_um = section_numbers * section_thickness_um
+    print(f"section_um: {pred_um/25}")
     avg_dist = np.mean(pred_um - section_um)
+    print("ideal: ",  (section_um+avg_dist)/25)
+    print("pred_UM: ")
+    print(f"average distance: {avg_dist}")
+    print((pred_um-section_um) - avg_dist)
     return ((section_um+avg_dist))/25    
 
 def calculate_brain_center_depth(section):
@@ -74,9 +81,9 @@ class DeepSlice:
             model.load_weights(DS_weights)
         return model
 
-    def Build(self,DS_weights = path+'/NN_weights/Synthetic_data_final.hdf5',\
+    def Build(self,DS_weights = path+'/NN_weights/Allen_Mixed_Best.h5',\
          xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5',
-              wise=False, wise_weights=path+'/NN_weights/Allen_Mixed_Best.h5'):
+              wise=False, wise_weights=path+'/NN_weights/Synthetic_data_final.hdf5'):
         self.model1 = self.init_model(DS_weights=DS_weights, xception_weights=xception_weights)
         if wise:
             self.model2 = self.init_model(DS_weights= wise_weights, xception_weights=xception_weights)
@@ -105,6 +112,7 @@ class DeepSlice:
         # convert the parameter values to floating point digits
         preds = preds.astype(float)
         if wise:
+            self.Image_generator.reset()
             wise_preds = self.model2.predict(self.Image_generator,
                                    steps=self.Image_generator.n // self.Image_generator.batch_size, verbose=1)
             preds = np.mean((preds, wise_preds), axis=0)
@@ -122,18 +130,31 @@ class DeepSlice:
 
 
 
-    def even_spacing(self, section_thickness_um=None):
+    def even_spacing(self, section_thickness_um=None, no_correction = False):
+        print("Section Numbers must have been included as the last three digits of the Filename")
         ###This function takes a dataset with section numbers and spaces those sections based on their numbers
         section_numbers = []
-        for Filename in self.results.Filenames.values:
+        depth = []
+        count=1
+        for Filename in self.results.Filenames.str.split('\\', expand=True).iloc[:,-1].values:
             ##this removes all non-numeric characters
             section_number = re.sub("[^0-9]", "", Filename)
             ###this gets the three numbers closest to the end
             section_number = section_number[-3:]
+            ind = [Filename in i for i in self.results.Filenames.values]
+            d = self.results[ind]
+            d = calculate_brain_center_depth(d[self.columns].values[0])
+            print(f"Filename: {Filename} section_number: {section_number} depth: {d}")
+
             ###find the first appearancex of the specified pattern
             ###remove non-numeric characters
+            if len(section_number)<3:
+                warnings.warn(f"could not find three digit section number for file \"{Filename}\", it should be the last three digits of the filenames.")
+            if len(section_number)==0:
+                warnings.warn(f"could not find any section number for file \"{Filename}\, using {count} instead")
+                section_numbers.append(count)
+            count+=1
             section_numbers.append(section_number)
-
 
         self.results['section_ID'] = section_numbers
         self.results.section_ID = self.results.section_ID.astype(np.float64)
@@ -144,18 +165,35 @@ class DeepSlice:
             depth.append((calculate_brain_center_depth(section)))
         
         estimate_thickness = ideal_thickness(self.results, depth)
+        print("\n", estimate_thickness, "\n")
+
+
         if estimate_thickness<0:
             print("the sections are not numbered rostrocaudaly")
+
         else:
             print("the sections are numbered rostrocaudaly")
-            self.results.section_ID = (self.results.section_ID.max() - self.results.section_ID)
+            if section_thickness_um is not None:
+                section_thickness_um*=-1
 
+        if section_thickness_um is None:
+            section_thickness_um = -estimate_thickness
 
-        if section_thickness_um==None:
-                section_thickness_um = estimate_thickness
+        if no_correction:
+            return 
+
 
         ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um)
+
         self.results.oy-=(depth-ideal)
+        depth = []
+        for section in self.results[self.columns].values:
+            depth.append((calculate_brain_center_depth(section)))
+        ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um)
+        self.results.section_ID = np.abs(self.results.section_ID)
+
+
+
 
     def propagate_angles(self, huber=True):
         DV = []
@@ -201,7 +239,7 @@ class DeepSlice:
                     section, mean=prop_ML[count], direction='ML')
             rotated_depth = calculate_brain_center_depth(section)
             movement = rotated_depth - original_depth
-            section[1] -= movement
+            # section[1] -= movement
             rotated_sections.append(section)
             cross, k = plane_alignment.find_plane_equation(section)
             final_depth = calculate_brain_center_depth(section)
@@ -215,5 +253,9 @@ class DeepSlice:
         self.results = results[ordered_cols]  # To get the same column order
 
     def Save_Results(self, filename):
+        if 'section_ID' in  self.results:
+            section_numbers = np.abs(self.results['section_ID'])
+        else:
+            section_numbers = None
         pd_to_quickNII(results=self.results,
-                       orientation='coronal', filename=str(filename), web=self.web, folder_name=self.folder_name)
+                       orientation='coronal', filename=str(filename), web=self.web, folder_name=self.folder_name, aligner = 'DeepSlice_ver_3.0_python')
