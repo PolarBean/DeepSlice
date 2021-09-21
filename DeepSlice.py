@@ -82,12 +82,11 @@ class DeepSlice:
         return model
 
     def Build(self,DS_weights = path+'/NN_weights/Allen_Mixed_Best.h5',\
-         xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5',
-              wise=False, wise_weights=path+'/NN_weights/Synthetic_data_final.hdf5'):
-        self.model1 = self.init_model(DS_weights=DS_weights, xception_weights=xception_weights)
-        if wise:
-            self.model2 = self.init_model(DS_weights= wise_weights, xception_weights=xception_weights)
-
+         xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5',wise_weights=path+'/NN_weights/Synthetic_data_final.hdf5'):
+        self.wise_weights = wise_weights
+        self.DS_weights = DS_weights
+        self.model = self.init_model(DS_weights=DS_weights, xception_weights=xception_weights)
+ 
 
 
     def gray_scale(self, img):
@@ -107,15 +106,18 @@ class DeepSlice:
         # reset the image generator to ensure it starts from the first image
         self.Image_generator.reset()
         # feed images to the model and store the predicted parameters
-        preds = self.model1.predict(self.Image_generator,
+        preds = self.model.predict(self.Image_generator,
                                    steps=self.Image_generator.n // self.Image_generator.batch_size, verbose=1)
         # convert the parameter values to floating point digits
         preds = preds.astype(float)
         if wise:
             self.Image_generator.reset()
-            wise_preds = self.model2.predict(self.Image_generator,
+            self.model.load_weights(self.wise_weights)
+            wise_preds = self.model.predict(self.Image_generator,
                                    steps=self.Image_generator.n // self.Image_generator.batch_size, verbose=1)
+
             preds = np.mean((preds, wise_preds), axis=0)
+            self.model.load_weights(self.DS_weights)
 
         # define the column names
         self.columns = ["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]
