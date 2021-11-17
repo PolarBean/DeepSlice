@@ -85,7 +85,7 @@ class DeepSlice:
          xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5',wise_weights=path+'/NN_weights/Synthetic_data_final.hdf5'):
         self.wise_weights = wise_weights
         self.DS_weights = DS_weights
-        self.model = self.init_model(DS_weights=DS_weights, xception_weights=xception_weights)
+        self.model = self.init_model(DS_weights=self.DS_weights, xception_weights=xception_weights)
  
 
 
@@ -219,6 +219,9 @@ class DeepSlice:
         else:
             length = len(DV)
             weights = plane_alignment.make_gaussian_weights(0, 528)
+            oy=np.array(oy)
+            oy[oy<0] = 0
+            oy[oy>527]=527
             weights = [weights[int(y)] for y in oy]
             # DV = sorted(DV, key=abs)[int(length*0.75):]
             # ML = sorted(ML, key=abs)[int(length*0.75):]
