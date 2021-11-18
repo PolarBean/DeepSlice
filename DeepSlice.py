@@ -23,27 +23,38 @@ from scipy.stats import trim_mean
 from statistics import mean
 import re
 
-def ideal_thickness(results, depth):
+def ideal_thickness(results, depth, detect_bad_sections=False):
     number_spacing = np.float64(results['section_ID'].values[1:]) - np.float64(results['section_ID'].values[:-1])
     depth_spacing = (np.array(depth)[:-1] - np.array(depth)[1:])
-    predicted_thickness = np.mean(depth_spacing/number_spacing) * 25
-    thickness_variability = np.std(depth_spacing/number_spacing) * 25
+    norm_depth = depth_spacing/number_spacing
+ 
+    if detect_bad_sections==True:
+        predicted_thickness = np.mean(norm_depth) 
+        thickness_variability = np.std(norm_depth)
+        good_indexes = (norm_depth<(predicted_thickness+(thickness_variability*3))) & (norm_depth>(predicted_thickness-(thickness_variability*3)))
+        print(f"sections {results.Filenames[1:][~good_indexes]} appeared to be outliers and were not incorporated into the spacing analysis")
+        norm_depth = norm_depth[good_indexes]
+    predicted_thickness = np.mean(norm_depth) * 25
+    thickness_variability = np.std(norm_depth) * 25
+
     print("Your sections appear to be sectioned at {0:.4f} micron thickness".format(np.abs(predicted_thickness)))
     print("the variability of thickness is {0:.4f} microns".format(thickness_variability))
     return predicted_thickness
 
-def ideal_spacing(pred_oy, section_numbers, section_thickness_um):
-    pred_oy = np.float64(pred_oy)
+def ideal_spacing(pred_oy, section_numbers, section_thickness_um, bad_section_indexes=None):
+    if bad_section_indexes is None:
+        bad_section_indexes = [False] * len(pred_oy)
+    pred_oy = np.float64(pred_oy[~bad_section_indexes])
     section_numbers = np.float64(section_numbers.values)
     section_thickness_um = np.float64(section_thickness_um)
     pred_um = pred_oy * 25
     section_um = section_numbers * section_thickness_um
     print(f"section_um: {pred_um/25}")
-    avg_dist = np.mean(pred_um - section_um)
+    avg_dist = np.mean(pred_um - section_um[~bad_section_indexes])
     print("ideal: ",  (section_um+avg_dist)/25)
     print("pred_UM: ")
     print(f"average distance: {avg_dist}")
-    print((pred_um-section_um) - avg_dist)
+    # print((pred_um-section_um) - avg_dist)
     return ((section_um+avg_dist))/25    
 
 def calculate_brain_center_depth(section):
@@ -86,6 +97,7 @@ class DeepSlice:
         self.wise_weights = wise_weights
         self.DS_weights = DS_weights
         self.model = self.init_model(DS_weights=self.DS_weights, xception_weights=xception_weights)
+
  
 
 
@@ -130,9 +142,14 @@ class DeepSlice:
         if prop_angles:
             self.propagate_angles(huber)
 
+    def reorder_indexes(self):
+        # reorders values so they are in the same order as the indexes with minimal swaps
+        self.results.oy = sorted(self.results.oy) 
+    
 
+        
 
-    def even_spacing(self, section_thickness_um=None, no_correction = False):
+    def even_spacing(self, section_thickness_um=None, no_correction = False, order_only = False, bad_sections = [], detect_bad_sections = False):
         print("Section Numbers must have been included as the last three digits of the Filename")
         ###This function takes a dataset with section numbers and spaces those sections based on their numbers
         section_numbers = []
@@ -146,7 +163,7 @@ class DeepSlice:
             ind = [Filename in i for i in self.results.Filenames.values]
             d = self.results[ind]
             d = calculate_brain_center_depth(d[self.columns].values[0])
-            print(f"Filename: {Filename} section_number: {section_number} depth: {d}")
+            #print(f"Filename: {Filename} section_number: {section_number} depth: {d}")
 
             ###find the first appearancex of the specified pattern
             ###remove non-numeric characters
@@ -160,13 +177,20 @@ class DeepSlice:
 
         self.results['section_ID'] = section_numbers
         self.results.section_ID = self.results.section_ID.astype(np.float64)
-        self.results = self.results.sort_values('section_ID', ascending=False)
+        self.results = self.results.sort_values('section_ID', ascending=False).reset_index(drop=True)
 
+
+        if order_only:
+            self.reorder_indexes()
         depth = []
         for section in self.results[self.columns].values:
             depth.append((calculate_brain_center_depth(section)))
-        
-        estimate_thickness = ideal_thickness(self.results, depth)
+        depth = np.array(depth)
+        self.results['depth'] = pd.Series(depth)
+        self.results.to_csv("quickCheck.csv")
+        bad_section_indexes = np.sum([self.results.Filenames.str.contains(bs) for bs in bad_sections], axis=0, dtype=bool)
+        print(f" we found {np.sum(bad_section_indexes)} out of {len(bad_sections)} bad sections")
+        estimate_thickness = ideal_thickness(self.results[~bad_section_indexes], depth[~bad_section_indexes], detect_bad_sections=detect_bad_sections)
         print("\n", estimate_thickness, "\n")
 
 
@@ -184,14 +208,13 @@ class DeepSlice:
         if no_correction:
             return 
 
-
-        ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um)
+        print(len(depth))
+        ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um, bad_section_indexes = bad_section_indexes)
 
         self.results.oy-=(depth-ideal)
         depth = []
         for section in self.results[self.columns].values:
             depth.append((calculate_brain_center_depth(section)))
-        ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um)
         self.results.section_ID = np.abs(self.results.section_ID)
 
 
