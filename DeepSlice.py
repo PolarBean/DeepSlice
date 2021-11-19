@@ -43,7 +43,8 @@ def ideal_thickness(results, depth, detect_bad_sections=False):
 
 def ideal_spacing(pred_oy, section_numbers, section_thickness_um, bad_section_indexes=None):
     if bad_section_indexes is None:
-        bad_section_indexes = [False] * len(pred_oy)
+        bad_section_indexes = np.array([False] * len(pred_oy))
+
     pred_oy = np.float64(pred_oy[~bad_section_indexes])
     section_numbers = np.float64(section_numbers.values)
     section_thickness_um = np.float64(section_thickness_um)
@@ -188,9 +189,13 @@ class DeepSlice:
         depth = np.array(depth)
         self.results['depth'] = pd.Series(depth)
         self.results.to_csv("quickCheck.csv")
-        bad_section_indexes = np.sum([self.results.Filenames.str.contains(bs) for bs in bad_sections], axis=0, dtype=bool)
-        print(f" we found {np.sum(bad_section_indexes)} out of {len(bad_sections)} bad sections")
-        estimate_thickness = ideal_thickness(self.results[~bad_section_indexes], depth[~bad_section_indexes], detect_bad_sections=detect_bad_sections)
+        if len(bad_sections)>0:
+            bad_section_indexes = np.sum([self.results.Filenames.str.contains(bs) for bs in bad_sections], axis=0, dtype=bool)
+            print(f" we found {np.sum(bad_section_indexes)} out of {len(bad_sections)} bad sections")
+            estimate_thickness = ideal_thickness(self.results[~bad_section_indexes], depth[~bad_section_indexes], detect_bad_sections=detect_bad_sections)
+        else:
+            estimate_thickness = ideal_thickness(self.results, depth, detect_bad_sections=detect_bad_sections)
+
         print("\n", estimate_thickness, "\n")
 
 
@@ -209,7 +214,11 @@ class DeepSlice:
             return 
 
         print(len(depth))
-        ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um, bad_section_indexes = bad_section_indexes)
+        if len(bad_sections)>0:
+            ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um, bad_section_indexes = bad_section_indexes)
+        else:
+            ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um)
+
 
         self.results.oy-=(depth-ideal)
         depth = []
