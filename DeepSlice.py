@@ -94,11 +94,15 @@ class DeepSlice:
         return model
 
     def Build(self,DS_weights = path+'/NN_weights/Allen_Mixed_Best.h5',\
-         xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5',wise_weights=path+'/NN_weights/Synthetic_data_final.hdf5'):
+         xception_weights=path+'/NN_weights/xception_weights_tf_dim_ordering_tf_kernels.h5',wise_weights=path+'/NN_weights/Synthetic_data_final.hdf5', species='mouse'):
         self.wise_weights = wise_weights
         self.DS_weights = DS_weights
-        self.model = self.init_model(DS_weights=self.DS_weights, xception_weights=xception_weights)
-
+        self.rat_weights = path+'/NN_weights/rat_mixed_4056.h5'
+        if species.lower()=='rat':
+           self.model = self.init_model(DS_weights=self.rat_weights, xception_weights=xception_weights)
+        if species.lower()=='mouse':
+           self.model = self.init_model(DS_weights=self.DS_weights, xception_weights=xception_weights)
+        self.species=species
  
 
 
@@ -210,7 +214,7 @@ class DeepSlice:
         if section_thickness_um is None:
             section_thickness_um = -estimate_thickness
 
-        if no_correction:
+        if no_correction or order_only:
             return 
 
         print(len(depth))
