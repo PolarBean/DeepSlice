@@ -70,6 +70,8 @@ class DeepSlice:
     def __init__(self, web=False, folder_name=None):
         self.web = web
         self.folder_name = folder_name
+        self.columns = ["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]
+
 
     def init_model(self, DS_weights, xception_weights):
         # Download Xception architecture with weights pretrained on imagenet
@@ -137,7 +139,6 @@ class DeepSlice:
             self.model.load_weights(self.DS_weights)
 
         # define the column names
-        self.columns = ["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]
         # create a pandas DataFrame of the parameter values
         results = pd.DataFrame(preds, columns=self.columns)
         # insert the section filenames into the pandas DataFrame
@@ -237,11 +238,17 @@ class DeepSlice:
 
     def load_QuickNII(self, filename):
         self.results = XML_to_csv(filename)
+        self.results[self.columns] = self.results[self.columns].astype(np.float64)
 
     def set_angles(self, DV=None, ML=None):
         rotated_sections = []
         count = 0
         for section in self.results.iterrows():
+            m = section[1][['ox', 'oy', 'oz', 'ux', 'uy',
+                               'uz', 'vx', 'vy', 'vz']].values.astype(np.float64)
+            cross, k = plane_alignment.find_plane_equation(m)
+            old_DV = plane_alignment.get_angle(m, cross, k, 'DV')
+            old_ML = plane_alignment.get_angle(m, cross, k, 'ML')
             section = section[1][self.columns].values
             original_depth = calculate_brain_center_depth(section)
             for i in range(10):
@@ -249,9 +256,15 @@ class DeepSlice:
                 if DV is not None:
                     section = plane_alignment.Section_adjust(
                         section, mean=DV, direction='DV')
+                else:
+                    section = plane_alignment.Section_adjust(
+                        section, mean=old_DV, direction='DV')
                 if ML is not None:
                     section = plane_alignment.Section_adjust(
                         section, mean=ML, direction='ML')
+                else:
+                    section = plane_alignment.Section_adjust(
+                        section, mean=old_ML, direction='DV')
             rotated_depth = calculate_brain_center_depth(section)
             movement = rotated_depth - original_depth
             # section[1] -= movement
