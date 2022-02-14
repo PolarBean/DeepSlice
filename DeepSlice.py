@@ -14,7 +14,7 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense
 from skimage import color, transform
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from utilities.QuickNII_functions import pd_to_quickNII
+from utilities.QuickNII_functions import pd_to_quickNII, XML_to_csv
 from utilities import plane_alignment
 import pandas as pd
 import numpy as np
@@ -150,15 +150,19 @@ class DeepSlice:
 
         
 
-    def even_spacing(self, section_thickness_um=None, no_correction = False, order_only = False, bad_sections = [], detect_bad_sections = False):
+    def even_spacing(self, section_thickness_um=None, no_correction = False, order_only = False, bad_sections = [], detect_bad_sections = False, ignore_final_chars = 0):
         print("Section Numbers must have been included as the last three digits of the Filename")
         ###This function takes a dataset with section numbers and spaces those sections based on their numbers
         section_numbers = []
         depth = []
         count=1
         for Filename in self.results.Filenames.str.split('\\', expand=True).iloc[:,-1].values:
+            if ignore_final_chars > 0:
+                temp_filename = Filename[:-ignore_final_chars]
+            else:
+                temp_filename = Filename
             ##this removes all non-numeric characters
-            section_number = re.sub("[^0-9]", "", Filename)
+            section_number = re.sub("[^0-9]", "", temp_filename)
             ###this gets the three numbers closest to the end
             section_number = section_number[-3:]
             ind = [Filename in i for i in self.results.Filenames.values]
@@ -227,6 +231,34 @@ class DeepSlice:
         self.results.section_ID = np.abs(self.results.section_ID)
 
 
+    def load_QuickNII(self, filename):
+        self.results = XML_to_csv(filename)
+
+    def set_angles(self, DV=None, ML=None):
+        rotated_sections = []
+        count = 0
+        for section in self.results.iterrows():
+            section = section[1][self.columns].values
+            original_depth = calculate_brain_center_depth(section)
+            for i in range(10):
+                cross, k = plane_alignment.find_plane_equation(section)
+                if DV is not None:
+                    section = plane_alignment.Section_adjust(
+                        section, mean=DV, direction='DV')
+                if ML is not None:
+                    section = plane_alignment.Section_adjust(
+                        section, mean=ML, direction='ML')
+            rotated_depth = calculate_brain_center_depth(section)
+            movement = rotated_depth - original_depth
+            # section[1] -= movement
+            rotated_sections.append(section)
+            cross, k = plane_alignment.find_plane_equation(section)
+            final_depth = calculate_brain_center_depth(section)
+            # print(" original: {} \n rotated {} \n corrected {} \n".format(original_depth, rotated_depth, final_depth))
+
+            count += 1
+        self.results[self.columns] = rotated_sections
+        # insert the section filenames into the pandas DataFrame
 
 
     def propagate_angles(self, huber=True):
