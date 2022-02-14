@@ -9,13 +9,19 @@ image_list = []
 
 
 def find_plane_equation(plane):
+    '''
+    Finds the plane equation of a plane
+    :param plane: the plane to find the equation of
+    :type plane: :any:`numpy.ndarray`
+    :returns: the normal vector of the plane and the constant k
+    :rtype: :any:`numpy.ndarray`, float
+    '''
     a, b, c = np.array(plane[0:3], dtype=np.float64), np.array(plane[3:6], dtype=np.float64), np.array(plane[6:9],
                                                                                                        dtype=np.float64)
     cross = np.cross(b, c)
     cross /= 9
     k = -((a[0] * cross[0]) + (a[1] * cross[1]) + (a[2] * cross[2]))
     return (cross, k)
-
 
 def get_angle(inp, cross, k, direction):
     # inp is the input plane, represented by 3 xzy sets
@@ -36,8 +42,9 @@ def get_angle(inp, cross, k, direction):
         # this tells us the depth of that point which differs in x dimension but lies on the same plane
         depth = -(linear_point / cross[1])
         b = np.array((section[0] - 100, depth))
-
         c = b + [100, 0]
+
+        
     if direction == 'DV':
         a = section[1:3]
         linear_point = (((section[0]) * cross[0]) +
@@ -87,6 +94,15 @@ def rotation_around_axis(axis, angle):
 
 
 def make_gaussian_weights(mini, maxi):
+    '''
+    Generates a list of weights for a gaussian distribution
+    :param mini: the minimum value of the distribution
+    :type mini: float
+    :param maxi: the maximum value of the distribution
+    :type maxi: float
+    :returns: a list of weights
+    :rtype: list
+    '''
     weights = []
     center = mean((mini, maxi))
     quartile = (maxi-mini)/4
@@ -101,31 +117,122 @@ def make_gaussian_weights(mini, maxi):
     return [x/max(weights) for x in weights]
 
 
-def get_axis(m, translation_vector, direction):
+def get_axis(m, translation_vector, direction, plane_of_section=None, atlas='AMBA'):
+    '''
+    :param m: the matrix to rotate
+    :type m: 3x3 :any:`numpy.ndarray`
+    :param translation_vector: the translation vector to apply
+    :type translation_vector: 3x1 :any:`numpy.ndarray`
+    :param direction: the direction of the rotation
+    :type direction: string
+    :param plane: the plane to rotate around
+    :type plane: string
+    :returns: the axis of rotation
+    :rtype: 3x1 :any:`numpy.ndarray`
+    '''
     # find the plane equation for a set of QuickNII coordinates
     cross, k = find_plane_equation(m)
-    translated_volume = np.array((528, 0, 456)) - translation_vector
-    linear_point = (
-        ((translated_volume[0] / 2) * cross[0]) + ((translated_volume[2] / 2) * cross[2])) + k
-    depth = -(linear_point / cross[1])
-    axis = ((translated_volume[0] / 2, depth, translated_volume[2] / 2))
-    if direction == 'DV':
-        linear_point = (
-            ((translated_volume[0]) * cross[0]) + ((translated_volume[2] / 2) * cross[2])) + k
-    if direction == 'ML':
-        linear_point = (
-            ((translated_volume[0] / 2) * cross[0]) + ((translated_volume[2]) * cross[2])) + k
-    depth = -(linear_point / cross[1])
-    if direction == 'DV':
-        axis2 = ((translated_volume[0], depth, translated_volume[2] / 2))
-    if direction == 'ML':
-        axis2 = ((translated_volume[0] / 2, depth, translated_volume[2]))
+    if atlas == 'AMBA':
+        volume = np.array((528, 320, 456)) 
+        posx, posy, posz = volume/2
+
+    if atlas == 'WHS':
+        volume = np.array((512, 1024, 512))
+        posx, posy, posz = 256, 512, 256
+
+    translated_volume = volume - translation_vector
+
+    cor_linear_point = (
+    (((translated_volume[0] / 2)) * cross[0]) + ((translated_volume[2] / 2) * cross[2])) + k
+    cor_Y = -(cor_linear_point / cross[1])        
+    #     cor_axis = ((translated_volume[0] / 2, depth, translated_volume[2] / 2))
+
+    sag_linear_point = (
+    ((translated_volume[1] / 2) * cross[1]) + ((translated_volume[2] / 2) * cross[2])) + k
+    sag_X = -(sag_linear_point / cross[0])
+    #     sag_axis = ((translated_volume[1] / 2, depth, translated_volume[2] / 2))
+
+    horz_linear_point = (
+        ((translated_volume[0] / 2) * cross[0]) + ((translated_volume[1] / 2) * cross[1])) + k
+    horz_Z = -(horz_linear_point / cross[2])
+    if plane_of_section is None:
+        plane_of_section = np.argmin(np.abs((cor_Y - posy, sag_X - posx, horz_Z - posz)))
+    choices = {'x':  sag_X, ' y': cor_Y,' z':  horz_Z }
+
+    if plane_of_section == 0:
+        axis = ((translated_volume[0] / 2, cor_Y, translated_volume[2] / 2))
+        print(f'cor: {axis + translation_vector}')
+
+        if direction == 'DV':
+            linear_point = (
+                ((translated_volume[0]) * cross[0]) + ((translated_volume[2] / 2) * cross[2])) + k
+            Ypred = -(linear_point / cross[1])
+            ##the way QNII rotates is but i prefer my way
+        #             axis2 = ((translated_volume[0], cor_Y, translated_volume[2] / 2))
+            axis2 = ((translated_volume[0], Ypred, translated_volume[2] / 2))
+
+        ##this gives me the depth of a point directly beside the coronal center point
+        if direction == 'ML':
+            linear_point = (((translated_volume[0] / 2) * cross[0]) + ((translated_volume[2]) * cross[2])) + k 
+            Ypred = -(linear_point / cross[1])
+            axis2 = ((translated_volume[0] / 2, Ypred, translated_volume[2]))
+        
+        
+        
+        
+    if plane_of_section==1:
+        axis = ((sag_X, translated_volume[1] / 2, translated_volume[2] / 2))
+        print(f'sag: {axis + translation_vector}')
+
+        if direction == 'DV':
+            linear_point = (
+                ((translated_volume[1]) * cross[1]) + ((translated_volume[2] / 2) * cross[2])) + k
+            Xpred = -(linear_point / cross[0])
+            axis2 = ((Xpred, translated_volume[1], translated_volume[2] / 2))
+        if direction == 'ML':
+            linear_point = (
+                ((translated_volume[1] / 2) * cross[1]) + ((translated_volume[2]) * cross[2])) + k
+            Xpred = -(linear_point / cross[0])
+            axis2 = ((Xpred, translated_volume[1] / 2, translated_volume[2]))
+            
+        
+    if plane_of_section==2:
+        axis = ((translated_volume[0] / 2,  translated_volume[1] / 2, horz_Z))
+        print(f'horz: {axis + translation_vector}')
+        if direction == 'DV':
+            linear_point = (
+                ((translated_volume[0]) * cross[0]) + ((translated_volume[1] / 2) * cross[1])) + k
+            Zpred = -(linear_point / cross[2])
+            axis2 = ((translated_volume[0], translated_volume[1] / 2, Zpred))
+
+
+        if direction == 'ML':
+            linear_point = (
+                ((translated_volume[0] / 2) * cross[0]) + ((translated_volume[1]) * cross[1])) + k
+            Zpred = -(linear_point / cross[2])
+            axis2 = ((translated_volume[0] / 2, translated_volume[1], Zpred))
     axis_vector = np.array(axis) - np.array(axis2)
     return (axis_vector)
 
 
-def rotate_section(section, degrees, direction):
+
+def rotate_section(section, degrees, direction, plane_of_section=None, atlas = 'AMBA'):
+    '''
+    Rotates a section
+    :param section: the section to rotate
+    :type section: :any:`numpy.ndarray`
+    :param degrees: the degrees to rotate the section
+    :type degrees: float
+    :param direction: the direction of the rotation
+    :type direction: string
+    :param plane: the plane to rotate around
+    :type plane: string
+    :returns: the rotated section
+    :rtype: :any:`numpy.ndarray`
+    '''
+
     cross, k = find_plane_equation(section)
+
     # this looks redundant
     # if direction==ML:
     #   ML=get_angle(section.reshape(9),cross,k,direction=direction)
@@ -135,14 +242,49 @@ def rotate_section(section, degrees, direction):
         section_points[i + 6] += section_points[i]
 
     points = section_points.reshape(3, 3)
-    translated_volume = np.array((528, 0, 456))
-    linear_point = (
-        ((translated_volume[0] / 2) * cross[0]) + ((translated_volume[2] / 2) * cross[2])) + k
-    depth = -(linear_point / cross[1])
-    translation_vector = (
-        (translated_volume[0] / 2, depth, translated_volume[2] / 2))
+    if atlas == 'WHS':
+        translated_volume = np.array((489, 1024, 590))
+        posx, posy, posz = 256, 512, 256
+    if atlas == 'AMBA':
+        translated_volume = np.array((528, 320, 456))
+        posx, posy, posz = translated_volume/2
+
+    cor_linear_point = (
+        (((translated_volume[0] / 2)) * cross[0]) + ((translated_volume[2] / 2) * cross[2])) + k
+    cor_Y = -(cor_linear_point / cross[1])        
+#     cor_axis = ((translated_volume[0] / 2, depth, translated_volume[2] / 2))
+    
+    sag_linear_point = (
+        ((translated_volume[1] / 2) * cross[1]) + ((translated_volume[2] / 2) * cross[2])) + k
+    sag_X = -(sag_linear_point / cross[0])
+#     sag_axis = ((translated_volume[1] / 2, depth, translated_volume[2] / 2))
+    
+    horz_linear_point = (
+            ((translated_volume[0] / 2) * cross[0]) + ((translated_volume[1] / 2) * cross[1])) + k
+    horz_Z = -(horz_linear_point / cross[2])
+    if plane_of_section is None:
+        plane_of_section = np.argmin(np.abs((cor_Y - posy, sag_X - posx, horz_Z - posz)))
+#     midpoint = translated_volume/2
+#     x = symbols('x')
+#     expr = sum((x * cross + midpoint) * cross) - k
+#     m = solve(expr)
+#     translation_vector = np.array((m * cross + midpoint), dtype=np.float)
+    if plane_of_section==0:
+        
+        translation_vector = (
+            (translated_volume[0] / 2, cor_Y, translated_volume[2] / 2))
+        
+    if plane_of_section==1:
+        translation_vector = (
+            (sag_X, translated_volume[1] / 2, translated_volume[2] / 2))
+        
+    if plane_of_section==2:
+        translation_vector = (
+            (translated_volume[0] / 2, translated_volume[1] / 2, horz_Z))
+
     translated_points = points - translation_vector
-    axis = get_axis(section, translation_vector, direction=direction)
+    axis = get_axis(section, translation_vector, direction=direction, plane_of_section=plane_of_section)
+    print(axis)
     rot_matrix = rotation_around_axis(axis, degrees)
     # perform rotation, centred on (0,0,0)
     rotated_translated_points = np.dot(translated_points, rot_matrix)
@@ -153,6 +295,7 @@ def rotate_section(section, degrees, direction):
         rotated_points[i + 3] -= rotated_points[i]
         rotated_points[i + 6] -= rotated_points[i]
     return (rotated_points)
+
 
 
 def Section_adjust(section, direction, mean):
