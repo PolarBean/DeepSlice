@@ -190,8 +190,8 @@ class DeepSlice:
         self.results = self.results.sort_values('section_ID', ascending=False).reset_index(drop=True)
 
 
-        if order_only:
-            self.reorder_indexes()
+        
+        self.reorder_indexes()
         depth = []
         for section in self.results[self.columns].values:
             depth.append((calculate_brain_center_depth(section)))
