@@ -196,7 +196,7 @@ class DeepSlice:
         for section in self.results[self.columns].values:
             depth.append((calculate_brain_center_depth(section)))
         depth = np.array(depth)
-        if depth[0:] - depth[:-1] < 0:
+        if np.mean(depth[1:] - depth[:-1]) < 0:
             self.reorder_indexes(ascending=True)
         else:
             self.reorder_indexes(ascending=False)
