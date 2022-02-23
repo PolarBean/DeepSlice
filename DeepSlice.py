@@ -148,9 +148,9 @@ class DeepSlice:
         if prop_angles:
             self.propagate_angles(huber)
 
-    def reorder_indexes(self):
+    def reorder_indexes(self, ascending):
         # reorders values so they are in the same order as the indexes with minimal swaps
-        self.results.oy = sorted(self.results.oy) 
+        self.results = self.results.sort_values('oy', ascending=ascending)
     
 
         
@@ -186,18 +186,21 @@ class DeepSlice:
             section_numbers.append(section_number)
 
         self.results['section_ID'] = section_numbers
+
         self.results.section_ID = self.results.section_ID.astype(np.float64)
-        self.results = self.results.sort_values('section_ID', ascending=False).reset_index(drop=True)
+        self.results = self.results.sort_values('section_ID', ascending=True).reset_index(drop=True)
 
 
         
-        self.reorder_indexes()
         depth = []
         for section in self.results[self.columns].values:
             depth.append((calculate_brain_center_depth(section)))
         depth = np.array(depth)
+        if depth[0:] - depth[:-1] < 0:
+            self.reorder_indexes(ascending=True)
+        else:
+            self.reorder_indexes(ascending=False)
         self.results['depth'] = pd.Series(depth)
-        self.results.to_csv("quickCheck.csv")
         if len(bad_sections)>0:
             bad_section_indexes = np.sum([self.results.Filenames.str.contains(bs) for bs in bad_sections], axis=0, dtype=bool)
             print(f" we found {np.sum(bad_section_indexes)} out of {len(bad_sections)} bad sections")
