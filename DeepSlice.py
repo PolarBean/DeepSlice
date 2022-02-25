@@ -150,7 +150,7 @@ class DeepSlice:
 
     def reorder_indexes(self, ascending):
         # reorders values so they are in the same order as the indexes with minimal swaps
-        self.results = self.results.sort_values('oy', ascending=ascending)
+        self.results.oy = self.results.oy.sort_values(ascending=ascending).values
     
 
         
@@ -196,10 +196,7 @@ class DeepSlice:
         for section in self.results[self.columns].values:
             depth.append((calculate_brain_center_depth(section)))
         depth = np.array(depth)
-        if np.mean(depth[1:] - depth[:-1]) < 0:
-            self.reorder_indexes(ascending=True)
-        else:
-            self.reorder_indexes(ascending=False)
+
         self.results['depth'] = pd.Series(depth)
         if len(bad_sections)>0:
             bad_section_indexes = np.sum([self.results.Filenames.str.contains(bs) for bs in bad_sections], axis=0, dtype=bool)
@@ -213,9 +210,12 @@ class DeepSlice:
 
         if estimate_thickness<0:
             print("the sections are not numbered rostrocaudaly")
+            self.reorder_indexes(ascending=False)
 
         else:
             print("the sections are numbered rostrocaudaly")
+            self.reorder_indexes(ascending=True)
+
             if section_thickness_um is not None:
                 section_thickness_um*=-1
 
