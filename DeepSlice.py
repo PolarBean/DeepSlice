@@ -190,7 +190,7 @@ class DeepSlice:
         self.results.section_ID = self.results.section_ID.astype(np.float64)
         self.results = self.results.sort_values('section_ID', ascending=True).reset_index(drop=True)
 
-
+        print(self.results)
         
         depth = []
         for section in self.results[self.columns].values:
@@ -219,12 +219,27 @@ class DeepSlice:
             if section_thickness_um is not None:
                 section_thickness_um*=-1
 
-        if section_thickness_um is None:
-            section_thickness_um = -estimate_thickness
+
+
 
         if no_correction or order_only:
             return 
+        
+        depth = []
+        for section in self.results[self.columns].values:
+            depth.append((calculate_brain_center_depth(section)))
+        depth = np.array(depth)
+        
+        if len(bad_sections)>0:
+            bad_section_indexes = np.sum([self.results.Filenames.str.contains(bs) for bs in bad_sections], axis=0, dtype=bool)
+            print(f" we found {np.sum(bad_section_indexes)} out of {len(bad_sections)} bad sections")
+            estimate_thickness = ideal_thickness(self.results[~bad_section_indexes], depth[~bad_section_indexes], detect_bad_sections=detect_bad_sections)
+        else:
+            estimate_thickness = ideal_thickness(self.results, depth, detect_bad_sections=detect_bad_sections)
 
+            
+        if section_thickness_um is None:
+            section_thickness_um = -estimate_thickness
         print(len(depth))
         if len(bad_sections)>0:
             ideal = ideal_spacing(depth, self.results['section_ID'], section_thickness_um, bad_section_indexes = bad_section_indexes)
