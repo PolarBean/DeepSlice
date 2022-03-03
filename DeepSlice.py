@@ -206,14 +206,14 @@ class DeepSlice:
             estimate_thickness = ideal_thickness(self.results, depth, detect_bad_sections=detect_bad_sections)
 
         print("\n", estimate_thickness, "\n")
+        print('new version')
 
-
-        if estimate_thickness<0:
-            print("the sections are not numbered rostrocaudaly")
+        if estimate_thickness>0:
+            print("the sections are numbered rostrocaudaly")
             self.reorder_indexes(ascending=False)
 
         else:
-            print("the sections are numbered rostrocaudaly")
+            print("the sections are not numbered rostrocaudaly")
             self.reorder_indexes(ascending=True)
 
             if section_thickness_um is not None:
