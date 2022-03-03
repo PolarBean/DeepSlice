@@ -5,7 +5,7 @@ from pathlib import Path
 
 ##set path to be the DeepSlice directory
 path = str(Path(__file__).parent)
-
+##testing automated tests
 os.chdir(path)
 print(path)
 import warnings
