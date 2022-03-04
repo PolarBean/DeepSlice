@@ -1,6 +1,7 @@
 name: DS-CPU
 channels:
-  - defaults
+  - anaconda
+  - conda-forge
 dependencies:
   - _tflow_select=2.2.0=eigen
   - absl-py=0.11.0=pyhd3eb1b0_1
