@@ -8,45 +8,49 @@ def write_QuickNII_XML(df: pd.DataFrame, filename: str, aligner: str) -> None:
     """
     Converts a pandas DataFrame to a quickNII compatible XML
     """
-    if "nr" not in df.columns:
-        df["nr"] = np.arange(len(df)) + 1
-
+    df_temp = df.copy()
+    if "nr" not in df_temp.columns:
+        df_temp["nr"] = np.arange(len(df_temp)) + 1
+    df_temp[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz", "nr"]] = df[
+        ["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz", "nr"]
+    ].astype(str)
     out_df = pd.DataFrame(
         {
             "anchoring": "ox="
-            + (df.ox)
+            + (df_temp.ox)
             + "&oy="
-            + (df.oy)
+            + (df_temp.oy)
             + "&oz="
-            + (df.oz)
+            + (df_temp.oz)
             + "&ux="
-            + (df.ux)
+            + (df_temp.ux)
             + "&uy="
-            + (df.uy)
+            + (df_temp.uy)
             + "&uz="
-            + (df.uz)
+            + (df_temp.uz)
             + "&vx="
-            + (df.vx)
+            + (df_temp.vx)
             + "&vy="
-            + (df.vy)
+            + (df_temp.vy)
             + "&vz="
-            + (df.vz),
-            "filename": df.Filenames,
+            + (df_temp.vz),
+            "filename": df_temp.Filenames,
             "height": -999,
             "width": -999,
-            "nr": df.nr,
+            "nr": df_temp.nr,
         }
     )
+    print(f"saving to {filename}.xml")
 
     out_df.to_xml(
-        "pd_test.xml",
+        filename + ".xml",
         index=False,
         root_name="series",
         row_name="slice",
         attr_cols=list(out_df.columns),
         namespaces={
-            "first": df.nr[0],
-            "last": df.nr[-1],
+            "first": df_temp.nr.values[0],
+            "last": df_temp.nr.values[-1],
             "name": filename,
             "aligner": aligner,
             "": "",
