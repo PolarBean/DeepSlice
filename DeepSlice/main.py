@@ -61,6 +61,7 @@ class Model:
             predictions["nr"] = spacing_and_indexing.number_sections(
                 predictions["Filenames"], legacy_section_numbers
             )
+            predictions["nr"] = predictions["nr"].astype(int)
         #: pd.DataFrame: Filenames and predicted QuickNII coordinates of the input sections.
         self.predictions = predictions
 
@@ -117,5 +118,8 @@ class Model:
         aligner = self.config["DeepSlice_version"]["prerelease"]
         QuickNII_functions.write_QUINT_JSON(
             df=self.predictions, filename=filename, aligner=aligner, target=target
+        )
+        QuickNII_functions.write_QuickNII_XML(
+            df=self.predictions, filename=filename, aligner=aligner
         )
 
