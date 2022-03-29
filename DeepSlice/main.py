@@ -116,6 +116,7 @@ class Model:
         """
         target = self.config["target_volumes"][self.species]
         aligner = self.config["DeepSlice_version"]["prerelease"]
+        self.predictions.to_csv(filename + ".csv", index=False)
         QuickNII_functions.write_QUINT_JSON(
             df=self.predictions, filename=filename, aligner=aligner, target=target
         )
