@@ -68,15 +68,17 @@ def read_QuickNII_XML(filename: str) -> pd.DataFrame:
     """
     df = pd.read_xml(filename)
     # split the anchoring string into separate columns
-    anchoring = read.anchoring.str.split("&", expand=True).values
+    anchoring = df.anchoring.str.split("&", expand=True).values
     # lambda function to remove non_numeric characters besides '.', we need this as all the 'ox=' etc is still in the strings
-    strip = lambda x: "".join(c for c in x if c.isdigit() or c == ".")
+    strip = lambda x: "".join(
+        c for c in x if c.isdigit() or c == "." or c == "-" or c == "e"
+    )
     ##vectorise the lambda function and apply it to all elements
     anchoring = np.vectorize(strip)(anchoring)
 
-    out_df = pd.DataFrame({"Filename": df.filename})
+    out_df = pd.DataFrame({"Filenames": df.filename})
     out_df[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]] = anchoring
-    return df
+    return out_df
 
 
 def write_QUINT_JSON(
