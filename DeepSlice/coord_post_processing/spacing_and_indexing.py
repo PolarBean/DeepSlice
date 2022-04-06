@@ -127,6 +127,7 @@ def space_according_to_index(predictions):
     :return: the input dataframe with evenly spaced sections
     :rtype: pandas.DataFrame
     """
+    predictions["oy"] = predictions["oy"].astype(float)
     if len(predictions) == 1:
         raise ValueError("Only one section found, cannot space according to index")
     if "nr" not in predictions:

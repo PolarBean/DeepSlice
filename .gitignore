@@ -9,3 +9,5 @@ DS-test.py
 DS-test.py
 utilities/__pycache__/plane_alignment.cpython-37.pyc
 utilities/__pycache__/QuickNII_functions.cpython-37.pyc
+*.pyc
+*.pyc
