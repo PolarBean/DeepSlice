@@ -1,0 +1,25 @@
+{
+    "weight_file_paths":{
+        "mouse":{
+            "primary":"weights/Allen_Mixed_Best.h5",
+            "secondary":"weights/Synthetic_data_final.hdf5"
+            },
+        "rat":{
+            "primary":"weights/rat_mixed_4056.h5",
+            "secondary":"None"
+            },
+        "xception_imagenet":"weights/xception_weights_tf_dim_ordering_tf_kernels.h5"
+    },
+    "ensemble_status":{
+        "mouse":"True",
+        "rat":"False"
+        },
+    "target_volumes":{
+        "mouse":"ABA_Mouse_CCFv3_2017_25um.cutlas",
+        "rat": "WHS_Rat_v4_39um.cutlas"
+        },
+    "DeepSlice_version":{
+        "stable":"stable_0.3.0",
+        "prerelease":"prerelease_0.3.1"
+    }
+}
