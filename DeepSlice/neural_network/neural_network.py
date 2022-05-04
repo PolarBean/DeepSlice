@@ -8,6 +8,8 @@ import numpy as np
 import os
 from skimage.color import rgb2gray
 import warnings
+import imghdr
+import struct
 
 
 def gray_scale(img: np.ndarray) -> np.ndarray:
@@ -53,11 +55,17 @@ def load_images(image_path: str) -> np.ndarray:
     """
     if not os.path.isdir(image_path):
         raise ValueError("The path provided is not a directory")
-    valid_formats = [".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"]
+    valid_formats = [".jpg", ".jpeg", ".png"]
     images = glob(image_path + "/*")
+
     images = [i for i in images if os.path.splitext(i)[1].lower() in valid_formats]
+    sizes = [get_image_size(i) for i in images]
+    width = [i[0] for i in sizes]
+    height = [i[1] for i in sizes]
     if len(images) == 0:
-        raise ValueError(f"No images found in the directory, please ensure image files are one of the following formats: {', '.join(valid_formats)}")
+        raise ValueError(
+            f"No images found in the directory, please ensure image files are one of the following formats: {', '.join(valid_formats)}"
+        )
     image_df = pd.DataFrame({"Filenames": images})
     with warnings.catch_warnings():
         ##throws warning about samplewise_std_normalization conflicting with samplewise_center which we don't use.
@@ -74,7 +82,7 @@ def load_images(image_path: str) -> np.ndarray:
             shuffle=False,
             class_mode=None,
         )
-    return image_generator
+    return image_generator, width, height
 
 
 def predictions_util(
@@ -129,3 +137,38 @@ def predictions_util(
 
     return predictions_df
 
+
+def get_image_size(fname):
+    # https://stackoverflow.com/questions/8032642/how-to-obtain-image-size-using-standard-python-class-without-using-external-lib
+    """Determine the image type of fhandle and return its size.
+    from draco"""
+    with open(fname, "rb") as fhandle:
+        head = fhandle.read(24)
+        if len(head) != 24:
+            raise Exception("Invalid header")
+
+        ext = imghdr.what(fname)
+        if imghdr.what(fname) == "png":
+            check = struct.unpack(">i", head[4:8])[0]
+            if check != 0x0D0A1A0A:
+                raise Exception("png checksum failed")
+            width, height = struct.unpack(">ii", head[16:24])
+        elif imghdr.what(fname) == "gif":
+            width, height = struct.unpack("<HH", head[6:10])
+        elif imghdr.what(fname) == "jpeg":
+            fhandle.seek(0)  # Read 0xff next
+            size = 2
+            ftype = 0
+            while not 0xC0 <= ftype <= 0xCF:
+                fhandle.seek(size, 1)
+                byte = fhandle.read(1)
+                while ord(byte) == 0xFF:
+                    byte = fhandle.read(1)
+                ftype = ord(byte)
+                size = struct.unpack(">H", fhandle.read(2))[0] - 2
+            # We are at a SOFn block
+            fhandle.seek(1, 1)  # Skip `precision' byte.
+            height, width = struct.unpack(">HH", fhandle.read(4))
+        else:
+            raise Exception(f"Invalid filetype: {head}")
+        return width, height

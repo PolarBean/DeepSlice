@@ -6,12 +6,14 @@ from .metadata import metadata_loader
 
 
 class Model:
+    """
+    Initialise a DeepSlice model for a given species.
+    :param species: the name of the species
+    :type species: str
+    """
+
     def __init__(self, species: str):
-        """
-        Initialise a DeepSlice model for a given species.
-        :param species: the name of the species
-        :type species: str
-        """
+        """Constructor method"""
         # The config file contains information about the DeepSlice version, and neural network weights for each species.
         self.config, self.weight_path = metadata_loader.load_config()
         self.species = species
@@ -27,15 +29,18 @@ class Model:
         section_numbers: bool = True,
         legacy_section_numbers=False,
     ):
-        """
-        predicts the atlas position for a folder full of histological brain sections
+        """predicts the atlas position for a folder full of histological brain sections
+
         :param image_directory: the directory containing the brain sections
-        :param ensemble: whether to use multiple models, this will default to True when available
-        :param section_numbers: whether this dataset includes section numbers (as the last three digits of the filename). 
         :type image_directory: str
-        :type ensemble: bool    
-        :type section_numbers: bool
+        :param ensemble: whether to use multiple models, this will default to True when available, defaults to None
+        :type ensemble: bool, optional
+        :param section_numbers: whether this dataset includes section numbers (as the last three digits of the filename) , defaults to True
+        :type section_numbers: bool, optional
+        :param legacy_section_numbers: a legacy setting which parses section numbers how old DeepSlice used to, defaults to False
+        :type legacy_section_numbers: bool, optional
         """
+
         # We set this to false as predict is the entry point for a new brain and therefore we need to reset all values which may persist from a previous animal.
         self.bad_sections_present = False
         # Different species may or may not have an ensemble model, so we need to check for this before defaulting to True
@@ -43,7 +48,7 @@ class Model:
             ensemble = self.config["ensemble_status"][self.species]
             ensemble = eval(ensemble)
 
-        image_generator = neural_network.load_images(image_directory)
+        image_generator, width, height = neural_network.load_images(image_directory)
         primary_weights = (
             self.weight_path + self.config["weight_file_paths"][self.species]["primary"]
         )
@@ -63,6 +68,8 @@ class Model:
             )
             predictions["nr"] = predictions["nr"].astype(int)
         #: pd.DataFrame: Filenames and predicted QuickNII coordinates of the input sections.
+        predictions["width"] = width
+        predictions["height"] = height
         self.predictions = predictions
 
     def set_bad_sections(self, bad_sections: list):

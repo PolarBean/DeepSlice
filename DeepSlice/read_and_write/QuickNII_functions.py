@@ -35,8 +35,8 @@ def write_QuickNII_XML(df: pd.DataFrame, filename: str, aligner: str) -> None:
             + "&vz="
             + (df_temp.vz),
             "filename": df_temp.Filenames,
-            "height": -999,
-            "width": -999,
+            "height": df_temp.height,
+            "width": df_temp.width,
             "nr": df_temp.nr,
         }
     )
@@ -75,7 +75,7 @@ def read_QuickNII_XML(filename: str) -> pd.DataFrame:
     )
     ##vectorise the lambda function and apply it to all elements
     anchoring = np.vectorize(strip)(anchoring)
-
+    anchoring = anchoring.astype(np.float64)
     out_df = pd.DataFrame({"Filenames": df.filename})
     out_df[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]] = anchoring
     return out_df
@@ -90,15 +90,23 @@ def write_QUINT_JSON(
     if "nr" not in df.columns:
         df["nr"] = np.arange(len(df)) + 1
     alignments = df[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]].values
+    if "markers" in df.columns:
+        markers = df.markers.values
+    else:
+        markers = [[]] * len(df)
+    print(len(markers))
     alignment_metadata = [
         {
             "filename": fn,
             "anchoring": list(alignment),
-            "height": -999,
-            "width": -999,
+            "height": h,
+            "width": w,
             "nr": nr,
+            "markers": marker,
         }
-        for fn, alignment, nr in zip(df.Filenames, alignments, df.nr)
+        for fn, alignment, nr, marker, h, w in zip(
+            df.Filenames, alignments, df.nr, markers, df.height, df.width
+        )
     ]
     QUINT_json = {
         "name": "",
@@ -125,9 +133,18 @@ def read_QUINT_JSON(filename: str) -> pd.DataFrame:
         data = json.load(f)
     sections = data["slices"]
     target_volume = data["target"]
-    alignments = [row["anchoring"] for row in sections]
-    filenames = [row["filename"] for row in sections]
-    section_numbers = [row["nr"] for row in sections]
-    df = pd.DataFrame({"Filename": filenames, "nr": section_numbers})
+    alignments = [
+        row["anchoring"] if "anchoring" in row else 9 * [np.nan] for row in sections
+    ]
+    height = [row["height"] if "height" in row else [] for row in sections]
+    width = [row["width"] if "width" in row else [] for row in sections]
+    filenames = [row["filename"] if "filename" in row else [] for row in sections]
+    section_numbers = [row["nr"] if "nr" in row else [] for row in sections]
+    markers = [row["markers"] if "markers" in row else [] for row in sections]
+    df = pd.DataFrame({"Filenames": filenames, "nr": section_numbers})
     df[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]] = alignments
+    df["markers"] = markers
+    df["height"] = height
+    df["width"] = width
     return df, target_volume
+
