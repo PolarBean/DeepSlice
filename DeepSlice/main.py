@@ -84,7 +84,7 @@ class Model:
 
     def enforce_index_order(self):
         """
-        reorders the section depths (oy) in the predictions such that they align with the section indexes 
+        reorders the section depths (oy) in the predictions such that they align with the section indexes
         """
         self.predictions = spacing_and_indexing.enforce_section_ordering(
             self.predictions

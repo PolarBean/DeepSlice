@@ -7,7 +7,7 @@ from .depth_estimation import calculate_brain_center_depths
 
 def trim_mean(arr: np.array, percent: int) -> float:
     """"
-    Calculates the trimmed mean of an array, sourced from: 
+    Calculates the trimmed mean of an array, sourced from:
     https://gist.github.com/StuffbyYuki/6f25f9f2f302cb5c1e82e4481016ccde
     :param arr: the array to calculate the trimmed mean of
     :type arr: np.array
@@ -92,6 +92,7 @@ def enforce_section_ordering(predictions):
     :return: the input dataframe ordered by section number
     :rtype: pandas.DataFrame
     """
+    predictions = predictions.sort_values(by=["nr"], ascending=True).reset_index(drop=True)
     if len(predictions) == 1:
         raise ValueError("Only one section found, cannot space according to index")
     if "nr" not in predictions:
@@ -121,7 +122,7 @@ def space_according_to_index(predictions):
     """
     Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
     cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
-    indexes must be 1, 2, 4). 
+    indexes must be 1, 2, 4).
     :param predictions: dataframe of predictions
     :type predictions: pandas.DataFrame
     :return: the input dataframe with evenly spaced sections
