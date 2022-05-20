@@ -1,0 +1,46 @@
+name: Add bugs to bugs project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@main
+        id: addItem
+        with:
+          project-url: https://github.com/orgs/Neural-Systems-at-UIO/projects/2
+          github-token: ${{ secrets.ORG_KEY }}
+
+      - uses: kalgurn/update-project-item-status@main
+        with:
+          project-url: https://github.com/orgs/Neural-Systems-at-UIO/projects/2
+          github-token: ${{ secrets.ORG_KEY }}
+          item-id: ${{ steps.addItem.outputs.itemId }}
+          status: "To Do"
+      - name: update proj field
+        env: 
+          GITHUB_TOKEN:   ${{ secrets.ORG_KEY }}
+          ORGANIZATION: Neural-Systems-at-UIO
+          ITEM_ID: ${{ steps.addItem.outputs.itemId }}
+          PROJECT_NUMBER: 2
+        run: |
+          gh api graphql -f query='
+            mutation($new_project_item_id: ID!) {
+              updateProjectNextItemField(
+                input: {
+                  projectId: "PN_kwDOA1P6j84ABziy",
+                  itemId: $new_project_item_id,
+                  fieldId: "PNF_lADOA1P6j84ABziyzgBDHjU",
+                  value: "OpenAlign",
+                }
+              ) {
+                projectNextItem {
+                  id
+                }
+              }   
+              }' -f new_project_item_id="${ITEM_ID}" 
