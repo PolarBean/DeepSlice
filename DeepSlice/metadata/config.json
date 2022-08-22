@@ -1,11 +1,10 @@
-{
-    "weight_file_paths":{
+{"weight_file_paths":{
         "mouse":{
             "primary":"weights/Allen_Mixed_Best.h5",
             "secondary":"weights/Synthetic_data_final.hdf5"
             },
         "rat":{
-            "primary":"weights/rat_mixed_4056.h5",
+            "primary":"weights/RatModelInProgress.h5",
             "secondary":"None"
             },
         "xception_imagenet":"weights/xception_weights_tf_dim_ordering_tf_kernels.h5"
@@ -21,5 +20,16 @@
     "DeepSlice_version":{
         "stable":"stable_0.3.0",
         "prerelease":"prerelease_0.3.1"
+    },
+    "volume_paths":{
+        "mouse":{
+            "nissl":"volumes/ara_nissl_25.nii",
+            "stpt":"volumes/average_template_25.nii"
+        },
+        "rat":{"NULL":"NULL"}
+        },
+"default_volumes":{
+    "mouse":"nissl",
+    "rat":"MRI"
     }
 }

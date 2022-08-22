@@ -22,7 +22,8 @@ class sparse_semantic_correspondence():
         self.search_box_radius_list = [3,3,2,2,2]
         self.draw_radius = [2,2,2,4,8]
         self.pad_mode = 'reflect'
-        self.L_final = 2 if fast else 1
+        # self.L_final = 2 if fast else 1
+        self.L_final = 1 if fast else 1
 
     def find_mapping(self, A, B, patch_size, initial_mapping, search_box_radius):
         assert(A.size() == B.size())

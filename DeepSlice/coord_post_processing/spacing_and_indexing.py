@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import re
 from .depth_estimation import calculate_brain_center_depths
-
+from .plane_alignment_functions import plane_alignment
 
 def trim_mean(arr: np.array, percent: int) -> float:
     """"
@@ -38,8 +38,12 @@ def calculate_average_section_thickness(
     # inter section depth differences
     depth_spacing = section_depth[:-1] - section_depth[1:]
     # dividing depth spacing by number spacing allows us to control for missing sections
+    min = 0
+    max = np.max(section_numbers)
+    weighted_accuracy = plane_alignment.make_gaussian_weights(min, max + 1)
+    weighted_accuracy = [weighted_accuracy[int(y)] for y in section_numbers]
     section_thicknesses = depth_spacing / number_spacing
-    average_thickness = np.mean(section_thicknesses)
+    average_thickness = np.average(section_thicknesses, weights = weighted_accuracy[1:])
     return average_thickness
 
 
@@ -62,7 +66,11 @@ def ideal_spacing(
     # unaligned voxel position of section numbers (evenly spaced depths)
     index_spaced_depth = section_numbers * average_thickness
     # average distance between the depths and the evenly spaced depths
-    distance_to_ideal = np.mean(section_depth - index_spaced_depth)
+    min = 0
+    max = np.max(section_numbers)
+    weighted_accuracy = plane_alignment.make_gaussian_weights(min, max + 1)
+    weighted_accuracy = [weighted_accuracy[int(y)] for y in section_numbers]
+    distance_to_ideal = np.average(section_depth - index_spaced_depth, weights = weighted_accuracy)
     # adjust the evenly spaced depths to minimise their distance to the predicted depths
     ideal_index_spaced_depth = index_spaced_depth + distance_to_ideal
     return ideal_index_spaced_depth
@@ -118,7 +126,7 @@ def enforce_section_ordering(predictions):
     return predictions
 
 
-def space_according_to_index(predictions):
+def space_according_to_index(predictions, section_thickness = None):
     """
     Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
     cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
@@ -128,6 +136,7 @@ def space_according_to_index(predictions):
     :return: the input dataframe with evenly spaced sections
     :rtype: pandas.DataFrame
     """
+    
     predictions["oy"] = predictions["oy"].astype(float)
     if len(predictions) == 1:
         raise ValueError("Only one section found, cannot space according to index")
@@ -139,9 +148,14 @@ def space_according_to_index(predictions):
         predictions = enforce_section_ordering(predictions)
         depths = calculate_brain_center_depths(predictions)
         depths = np.array(depths)
-        section_thickness = calculate_average_section_thickness(
-            predictions["nr"], depths
-        )
+        if not section_thickness:
+            section_thickness = calculate_average_section_thickness(
+                predictions["nr"], depths
+            )
+            print(f'predicted thickness is {section_thickness * 25}µm')
+        else:
+            print(f'specified thickness is {section_thickness * 25}µm')
+
         calculated_spacing = ideal_spacing(predictions["nr"], depths, section_thickness)
         distance_to_ideal = calculated_spacing - depths
         predictions["oy"] = predictions["oy"] + distance_to_ideal
@@ -160,7 +174,7 @@ def number_sections(filenames: List[str], legacy=False) -> List[int]:
     section_numbers = []
     for filename in filenames:
         if not legacy:
-            match = re.findall(r"\_s?\d+", filename)
+            match = re.findall(r"\_s\d+", filename)
             if len(match) == 0:
                 raise ValueError(f"No section number found in filename: {filename}")
             if len(match) > 1:

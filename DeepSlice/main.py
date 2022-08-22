@@ -1,9 +1,10 @@
+from email.mime import image
 from typing import Union
 from .coord_post_processing import spacing_and_indexing, angle_methods
 from .read_and_write import QuickNII_functions
 from .neural_network import neural_network
 from .metadata import metadata_loader
-
+from .non_linear.generate_slices import neural_best_buddies_full_brain
 
 class Model:
     """
@@ -15,11 +16,11 @@ class Model:
     def __init__(self, species: str):
         """Constructor method"""
         # The config file contains information about the DeepSlice version, and neural network weights for each species.
-        self.config, self.weight_path = metadata_loader.load_config()
+        self.config, self.metadata_path = metadata_loader.load_config()
         self.species = species
         self.model = neural_network.initialise_network(
-            self.weight_path + self.config["weight_file_paths"]["xception_imagenet"],
-            self.weight_path + self.config["weight_file_paths"][species]["primary"],
+            self.metadata_path + self.config["weight_file_paths"]["xception_imagenet"],
+            self.metadata_path + self.config["weight_file_paths"][species]["primary"],
         )
 
     def predict(
@@ -50,10 +51,10 @@ class Model:
 
         image_generator, width, height = neural_network.load_images(image_directory)
         primary_weights = (
-            self.weight_path + self.config["weight_file_paths"][self.species]["primary"]
+            self.metadata_path + self.config["weight_file_paths"][self.species]["primary"]
         )
         secondary_weights = (
-            self.weight_path
+            self.metadata_path
             + self.config["weight_file_paths"][self.species]["secondary"]
         )
         if secondary_weights is "None":
@@ -62,15 +63,23 @@ class Model:
         predictions = neural_network.predictions_util(
             self.model, image_generator, primary_weights, secondary_weights, ensemble
         )
+        predictions["width"] = width
+        predictions["height"] = height
         if section_numbers:
             predictions["nr"] = spacing_and_indexing.number_sections(
                 predictions["Filenames"], legacy_section_numbers
             )
             predictions["nr"] = predictions["nr"].astype(int)
+            predictions = predictions.sort_values(by = 'nr').reset_index(drop=True)
+        else:
+            ###this is just for coronal, change later
+            predictions = predictions.sort_values(by = 'oy').reset_index(drop=True)
+
+
         #: pd.DataFrame: Filenames and predicted QuickNII coordinates of the input sections.
-        predictions["width"] = width
-        predictions["height"] = height
+
         self.predictions = predictions
+        self.image_directory = image_directory
 
     def set_bad_sections(self, bad_sections: list):
         """
@@ -90,9 +99,9 @@ class Model:
             self.predictions
         )
 
-    def enforce_index_spacing(self):
+    def enforce_index_spacing(self, section_thickness = None):
         self.predictions = spacing_and_indexing.space_according_to_index(
-            self.predictions
+            self.predictions, section_thickness = section_thickness
         )
 
     def adjust_angles(self, ML: Union[int, float], DV: Union[int, float]):
@@ -114,6 +123,31 @@ class Model:
             self.predictions = angle_methods.propagate_angles(
                 self.predictions, method, self.species
             )
+            
+    def deform_atlas(self, method="NBB",reference_volume=None):
+        if not reference_volume:
+            reference_volume = self.config['default_volumes'][self.species]
+        volume_path = self.config["volume_paths"][self.species][reference_volume]
+        self.predictions = neural_best_buddies_full_brain(self.predictions, self.image_directory)
+    
+    def load_QUINT(self, filename):
+        """
+        Load a QUINT compatible JSON or XML.
+        :param filename: the name of the file to load
+        :type filename: str
+        """
+        if filename.lower().endswith('.json'):
+            predictions, target = QuickNII_functions.read_QUINT_JSON(filename)
+            if target == "ABA_Mouse_CCFv3_2017_25um.cutlas" and self.species!='mouse':
+                    self.species = 'mouse'
+                    print('Switching to a mouse model')
+            elif target == "WHS_Rat_v4_39um.cutlas" and self.species!='rat':
+                self.species = 'rat'
+                print("switching to a rat model")
+        elif filename.lower().endswith('.xml'):
+            predictions = QuickNII_functions.read_QuickNII_XML(filename)
+        self.predictions = predictions
+        
 
     def save_predictions(self, filename):
         """
