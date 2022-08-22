@@ -236,8 +236,8 @@ def rotate_section(section, degrees, direction, plane_of_section=None, atlas="AM
     :type degrees: float
     :param direction: the direction of the rotation
     :type direction: string
-    :param plane: the plane to rotate around
-    :type plane: string
+    :param plane_of_section: the plane to rotate around
+    :type plane_of_section: string
     :returns: the rotated section
     :rtype: :any:`numpy.ndarray`
     """

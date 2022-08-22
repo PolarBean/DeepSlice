@@ -102,7 +102,7 @@ def write_QUINT_JSON(
             "height": h,
             "width": w,
             "nr": nr,
-            "markers": marker,
+            "markers": marker[0] if len(marker)> 0 else [],
         }
         for fn, alignment, nr, marker, h, w in zip(
             df.Filenames, alignments, df.nr, markers, df.height, df.width

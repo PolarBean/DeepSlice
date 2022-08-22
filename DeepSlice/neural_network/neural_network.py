@@ -1,5 +1,6 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras import Model
 from tensorflow.keras.applications.xception import Xception
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from glob import glob
@@ -35,11 +36,12 @@ def initialise_network(xception_weights: str, weights: str) -> Sequential:
     base_model = Xception(include_top=True, weights=xception_weights)
     base_model._layers.pop()
     base_model._layers.pop()
-    model = Sequential()
-    model.add(base_model)
-    model.add(Dense(256, activation="relu"))
-    model.add(Dense(256, activation="relu"))
-    model.add(Dense(9, activation="linear"))
+    inputs = Input(shape=(299, 299, 3))
+    base_model_layer = base_model(inputs, training=True)
+    dense1_layer = Dense(256, activation="relu")(base_model_layer)
+    dense2_layer = Dense(256, activation="relu")(dense1_layer)
+    output_layer = Dense(9, activation="linear")(dense2_layer)
+    model = Model(inputs=inputs, outputs=output_layer)
     if weights != None:
         model.load_weights(weights)
     return model
@@ -78,6 +80,7 @@ def load_images(image_path: str) -> np.ndarray:
             y_col=None,
             target_size=(299, 299),
             batch_size=1,
+            
             colormode="rgb",
             shuffle=False,
             class_mode=None,
