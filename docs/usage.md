@@ -2,13 +2,13 @@
 ## On start                                                                                                                         
 After cloning our repo and navigating into the directory open an ipython session and import our package.                 
 ```python                                                                                                                
-ipython      
-from DeepSlice import DeepSlice       
+from DeepSlice import DSModel     
 ```                                                                                                                      
-Next, initiate the model and load our weights file.                                                                      
+Next, specify the species you would like to use and initiate the model.                                                                    
 ```python                                                                                                                
-Model = DeepSlice()         
-Model.Build() 
+species = 'mouse' #available species are 'mouse' and 'rat'
+
+Model = DSModel(species)
 ```                                                                             
 
 ---
@@ -26,32 +26,34 @@ Model.Build()
 
 ## Predictions
 
-Now your model is ready to use, just direct it towards the parent directory of the file you're interested in.            
+Now your model is ready to use, just direct it towards the folder containing the images you would like to align.            
 <br/> eg:                                                                                                                
 ```bash                                                                                                              
-├── parent_dir        
-│   ├── your_brain_folder
-│   │   ├── brain_slice_1.png 
-│   │   ├── brain_slice_2.png     
-│   │   ├── brain_slice_3.png
+    
+ ├── your_brain_folder
+ │   ├── brain_slice_1.png 
+ │   ├── brain_slice_2.png     
+ │   ├── brain_slice_3.png
 ```                                                                                                                      
 In this parent directory there should be only one sub folder, in this example this is "your_brain_folder".               
 <br />To align these images using DeepSlice simply call                                                                  
 ```python                                                                                                                
-Model.predict('parent_dir/')                                                                  
-Model.Save_Results('output_filename')  
-```                                                                                                                      
-This will produce an XML file which can be placed in the same directory as your images (here that would be "your_brain_folder") and then opened with QuickNII. 
+folderpath = 'examples/example_brain/GLTa/'
+#here you run the model on your folder
+#try with and without ensemble to find the model which best works for you
+#if you have section numbers included in the filename as _sXXX specify this :)
+Model.predict(folderpath, ensemble=True, section_numbers=True)    
+#If you would like to normalise the angles (you should)
+Model.propagate_angles()                     
+#To reorder your sections according to the section numbers 
+Model.enforce_index_order()    
+#alternatively if you know the precise spacing (ie; 1, 2, 4, indicates that section 3 has been left out of the series) Then you can use      
+#Furthermore if you know the exact section thickness in microns this can be included instead of None        
+Model.enforce_index_spacing(section_thickness = None)
+#now we save which will produce a json file which can be placed in the same directory as your images and then opened with QuickNII. 
+Model.save_predictions(folderpath + 'MyResults')                                                                                                             
 
-## Advanced Usage
 
-DeepSlice has several advanced features you may be interested in. DeepSlice first makes an initial pass through which produces independant predictions for each section. In the next stage it goes through and makes all sections parallel. Assuming all sections are from the same brain this second step makes the predictions more accurate. However if you would like to disable this second step simply pass the argument
-```python
-DeepSlice.predict('parent_dir/', prop_angles=False)
-```
-if you have alternative weights you would like to use or you have previously trained your own DeepSlice model, these can be passed to the model builder with the command
 
-```python
-DeepSlice.Build('path_to_weights/weights.h5')
 ```
 
