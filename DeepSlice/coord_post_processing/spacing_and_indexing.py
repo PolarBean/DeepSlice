@@ -126,7 +126,7 @@ def enforce_section_ordering(predictions):
     return predictions
 
 
-def space_according_to_index(predictions, section_thickness = None):
+def space_according_to_index(predictions, section_thickness = None, voxel_size = None):
     """
     Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
     cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
@@ -136,7 +136,10 @@ def space_according_to_index(predictions, section_thickness = None):
     :return: the input dataframe with evenly spaced sections
     :rtype: pandas.DataFrame
     """
-    
+    if voxel_size == None:
+        raise ValueError("voxel_size must be specified")
+    if section_thickness != None:
+        section_thickness/=voxel_size
     predictions["oy"] = predictions["oy"].astype(float)
     if len(predictions) == 1:
         raise ValueError("Only one section found, cannot space according to index")
@@ -152,9 +155,9 @@ def space_according_to_index(predictions, section_thickness = None):
             section_thickness = calculate_average_section_thickness(
                 predictions["nr"], depths
             )
-            print(f'predicted thickness is {section_thickness * 25}µm')
+            print(f'predicted thickness is {section_thickness * voxel_size}µm')
         else:
-            print(f'specified thickness is {section_thickness * 25}µm')
+            print(f'specified thickness is {section_thickness * voxel_size}µm')
 
         calculated_spacing = ideal_spacing(predictions["nr"], depths, section_thickness)
         distance_to_ideal = calculated_spacing - depths
