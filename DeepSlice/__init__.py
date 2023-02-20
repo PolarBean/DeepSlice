@@ -1,1 +1,1 @@
-from .main import Model
+from .main import DSModel

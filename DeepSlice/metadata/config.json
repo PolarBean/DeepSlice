@@ -1,33 +1,36 @@
 {"weight_file_paths":{
         "mouse":{
-            "primary":"weights/Allen_Mixed_Best.h5",
-            "secondary":"weights/Synthetic_data_final.hdf5"
+            "primary":{"path":"weights/Allen_Mixed_Best.h5","url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/weights/Allen_Mixed_Best.h5"},
+            "secondary":{"path":"weights/Synthetic_data_final.hdf5", "url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/weights/Synthetic_data_final.hdf5"}
             },
+            
         "rat":{
-            "primary":"weights/RatModelInProgress.h5",
-            "secondary":"None"
+            "primary":{"path":"weights/RatModelInProgress.h5","url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/weights/RatModelInProgress.h5"},
+            "secondary":{"path":"weights/RatModelScratch.h5", "url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/weights/RatModelScratch.h5"}
             },
-        "xception_imagenet":"weights/xception_weights_tf_dim_ordering_tf_kernels.h5"
+        "xception_imagenet":{"path":"weights/xception_weights_tf_dim_ordering_tf_kernels.h5", "url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/weights/xception_weights_tf_dim_ordering_tf_kernels.h5"}
     },
     "ensemble_status":{
         "mouse":"True",
         "rat":"False"
         },
     "target_volumes":{
-        "mouse":"ABA_Mouse_CCFv3_2017_25um.cutlas",
-        "rat": "WHS_Rat_v4_39um.cutlas"
+        "mouse":{"name":"ABA_Mouse_CCFv3_2017_25um.cutlas","voxel_size_microns":25},
+        "rat": {"name":"WHS_Rat_v4_39um.cutlas", "voxel_size_microns":39}
         },
     "DeepSlice_version":{
         "stable":"stable_0.3.0",
-        "prerelease":"prerelease_0.3.1"
+        "prerelease":"prerelease_1.0.0"
     },
     "volume_paths":{
         "mouse":{
-            "nissl":"volumes/ara_nissl_25.nii",
-            "stpt":"volumes/average_template_25.nii"
+            "nissl":{"path":"volumes/ara_nissl_25.nii",
+                    "url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/volumes/ara_nissl_25.nii"},
+            "stpt":{"path":"volumes/average_template_25.nii",
+                    "url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/volumes/average_template_25.nii"}
         },
-        "rat":{"NULL":"NULL"}
-        },
+        "rat":{"path":"WHS_SD_rat_T2star_v1.01.nii","url":"https://data-proxy.ebrains.eu/api/v1/buckets/deepslice/volumes/WHS_SD_rat_T2star_v1.01.nii"}
+    },
 "default_volumes":{
     "mouse":"nissl",
     "rat":"MRI"

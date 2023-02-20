@@ -1,6 +1,7 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras import Model
+import tensorflow as tf
 from tensorflow.keras.applications.xception import Xception
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from glob import glob
@@ -45,6 +46,7 @@ def initialise_network(xception_weights: str, weights: str) -> Sequential:
     if weights != None:
         model.load_weights(weights)
     return model
+
 
 
 def load_images(image_path: str) -> np.ndarray:

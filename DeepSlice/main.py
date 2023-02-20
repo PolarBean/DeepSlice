@@ -1,27 +1,44 @@
 from email.mime import image
+import os 
 from typing import Union
 from .coord_post_processing import spacing_and_indexing, angle_methods
 from .read_and_write import QuickNII_functions
 from .neural_network import neural_network
 from .metadata import metadata_loader
-from .non_linear.generate_slices import neural_best_buddies_full_brain
+import tensorflow as tf
 
-class Model:
-    """
-    Initialise a DeepSlice model for a given species.
-    :param species: the name of the species
-    :type species: str
-    """
 
-    def __init__(self, species: str):
-        """Constructor method"""
-        # The config file contains information about the DeepSlice version, and neural network weights for each species.
-        self.config, self.metadata_path = metadata_loader.load_config()
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras import Model
+import tensorflow as tf
+from tensorflow.keras.applications.xception import Xception
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from glob import glob
+import pandas as pd
+import numpy as np
+import os
+from skimage.color import rgb2gray
+import warnings
+import imghdr
+import struct
+
+
+
+
+class DSModel:
+    def __init__(self, species):
         self.species = species
-        self.model = neural_network.initialise_network(
-            self.metadata_path + self.config["weight_file_paths"]["xception_imagenet"],
-            self.metadata_path + self.config["weight_file_paths"][species]["primary"],
-        )
+
+        self.config, self.metadata_path = metadata_loader.load_config()
+        xception_weights =   metadata_loader.get_data_path(self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path)
+        weights =    metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
+        try:
+          self.model = neural_network.initialise_network(xception_weights, weights)
+        except:
+            self.model = neural_network.initialise_network(xception_weights, weights)
+        self.weights = weights
+
 
     def predict(
         self,
@@ -45,19 +62,16 @@ class Model:
         # We set this to false as predict is the entry point for a new brain and therefore we need to reset all values which may persist from a previous animal.
         self.bad_sections_present = False
         # Different species may or may not have an ensemble model, so we need to check for this before defaulting to True
-        if ensemble is None:
+        if ensemble == None:
             ensemble = self.config["ensemble_status"][self.species]
             ensemble = eval(ensemble)
 
         image_generator, width, height = neural_network.load_images(image_directory)
-        primary_weights = (
-            self.metadata_path + self.config["weight_file_paths"][self.species]["primary"]
-        )
-        secondary_weights = (
-            self.metadata_path
-            + self.config["weight_file_paths"][self.species]["secondary"]
-        )
-        if secondary_weights is "None":
+        primary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
+ 
+        secondary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["secondary"], self.metadata_path)
+
+        if secondary_weights == "None":
             print(f"ensemble is not available for {self.species}")
             ensemble = False
         predictions = neural_network.predictions_util(
@@ -99,9 +113,17 @@ class Model:
             self.predictions
         )
 
-    def enforce_index_spacing(self, section_thickness = None):
+    def enforce_index_spacing(self, section_thickness:Union[int, float] = None):
+        """
+        Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
+        cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
+        indexes must be 1, 2, 4).
+        :param section_thickness: the thickness of the sections in microns, defaults to None
+        :type section_thickness: Union[int, float], optional
+        """
+        voxel_size = self.config["target_volumes"][self.species]["voxel_size_microns"]
         self.predictions = spacing_and_indexing.space_according_to_index(
-            self.predictions, section_thickness = section_thickness
+            self.predictions, section_thickness = section_thickness, voxel_size = voxel_size
         )
 
     def adjust_angles(self, ML: Union[int, float], DV: Union[int, float]):
@@ -124,12 +146,7 @@ class Model:
                 self.predictions, method, self.species
             )
             
-    def deform_atlas(self, method="NBB",reference_volume=None):
-        if not reference_volume:
-            reference_volume = self.config['default_volumes'][self.species]
-        volume_path = self.config["volume_paths"][self.species][reference_volume]
-        self.predictions = neural_best_buddies_full_brain(self.predictions, self.image_directory)
-    
+
     def load_QUINT(self, filename):
         """
         Load a QUINT compatible JSON or XML.
@@ -155,7 +172,7 @@ class Model:
         :param filename: the name of the file to save to
         :type filename: str
         """
-        target = self.config["target_volumes"][self.species]
+        target  = self.config["target_volumes"][self.species]["name"]
         aligner = self.config["DeepSlice_version"]["prerelease"]
         self.predictions.to_csv(filename + ".csv", index=False)
         QuickNII_functions.write_QUINT_JSON(
