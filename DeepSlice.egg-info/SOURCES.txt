@@ -1,0 +1,12 @@
+LICENSE
+README.md
+setup.cfg
+setup.py
+DeepSlice/__init__.py
+DeepSlice/main.py
+DeepSlice.egg-info/PKG-INFO
+DeepSlice.egg-info/SOURCES.txt
+DeepSlice.egg-info/dependency_links.txt
+DeepSlice.egg-info/requires.txt
+DeepSlice.egg-info/top_level.txt
+test/test.py

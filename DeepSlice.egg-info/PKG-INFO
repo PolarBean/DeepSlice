@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: DeepSlice
+Version: 1.0.0
+Summary: A package to align histology to 3D brain atlases
+Home-page: https://github.com/PolarBean/DeepSlice
+Download-URL: https://github.com/PolarBean/DeepSlice/archive/refs/tags/1.0.tar.gz
+Author: DeepSlice Team
+Author-email: harry.carey@medisin.uio.no
+License: GPL-3.0
+Keywords: histology,brain,atlas,alignment
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: Python :: 3.7
+License-File: LICENSE

@@ -1,0 +1,6 @@
+numpy
+scikit-learn
+scikit-image
+tensorflow==1.15.0
+typing
+pandas
