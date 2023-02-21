@@ -13,3 +13,6 @@ utilities/__pycache__/QuickNII_functions.cpython-37.pyc
 *.pyc
 DeepSlice/metadata/volumes/*.nii
 DeepSlice/metadata/weights/*.h5
+setup.py
+setup.cfg
+dist

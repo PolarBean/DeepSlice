@@ -1,27 +1,8 @@
-from email.mime import image
-import os 
 from typing import Union
 from .coord_post_processing import spacing_and_indexing, angle_methods
 from .read_and_write import QuickNII_functions
 from .neural_network import neural_network
 from .metadata import metadata_loader
-import tensorflow as tf
-
-
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Input
-from tensorflow.keras import Model
-import tensorflow as tf
-from tensorflow.keras.applications.xception import Xception
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from glob import glob
-import pandas as pd
-import numpy as np
-import os
-from skimage.color import rgb2gray
-import warnings
-import imghdr
-import struct
 
 
 
