@@ -27,7 +27,7 @@ If you would like to use DeepSlice but don't need your own personal installation
 <!-- This h2 must be bold  -->
 
 <h2 style="font-weight: bold; text-decoration: underline"> From PIP  </h2>
-This is the easy and recommended way to install DeepSlice. 
+This is the easy and recommended way to install DeepSlice. Make sure your env has Python 3.7 installed and then simply:
 
 ```bash
 pip install DeepSlice
