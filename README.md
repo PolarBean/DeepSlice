@@ -32,7 +32,7 @@ This is the easy and recommended way to install DeepSlice.
 ```bash
 pip install DeepSlice
 ```
-And you're ready to go! 🚀
+And you're ready to go! 🚀 Check out the PyPi package [here](https://pypi.org/project/DeepSlice/)
 
 <h2 style="font-weight: bold; text-decoration: underline"> From Source </h2>
 
