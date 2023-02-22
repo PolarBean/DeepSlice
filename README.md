@@ -1,6 +1,6 @@
 ![Alt](docs/images/DeepSlice_github_banner.png "DeepSlice Banner")
-DeepSlice is a python library, published by [the McMullan Lab Group](https://researchers.mq.edu.au/en/persons/simon-mcmullan), which automatically aligns mouse histology with the allen brain atlas common coordinate framework.
-It is the Masters project of [Harry Carey](https://github.com/PolarBean/). The alignments are viewable, and refinable, using the [QuickNII](https://www.nitrc.org/projects/quicknii "QuickNII") software package.
+DeepSlice is a python library which automatically aligns mouse histology with the allen brain atlas common coordinate framework.
+The alignments are viewable, and refinable, using the [QuickNII](https://www.nitrc.org/projects/quicknii "QuickNII") software package.
 DeepSlice requires no preprocessing and works on any stain, however we have found it performs best on brightfield images.
 At present one limitation is that it only works on Coronally cut sections, we will release an update in the future for sagittal and horizontally cut histology.
 ![Alt](docs/images/process.PNG) 
