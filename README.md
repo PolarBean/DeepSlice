@@ -4,7 +4,11 @@ The alignments are viewable, and refinable, using the [QuickNII](https://www.nit
 DeepSlice requires no preprocessing and works on any stain, however we have found it performs best on brightfield images.
 At present one limitation is that it only works on Coronally cut sections, we will release an update in the future for sagittal and horizontally cut histology.
 ![Alt](docs/images/process.PNG) 
-DeepSlice automates the process of identifying exactly where in the brain a section lies, it can accomodate non-orthogonal cutting planes and will produce an image specific annotation for each section in your brain.   
+DeepSlice automates the process of identifying exactly where in the brain a section lies, it can accomodate non-orthogonal cutting planes and will produce an image specific annotation for each section in your brain.  
+
+## Workflow 
+DeepSlice is fully integrated with the <a href="https://quint-workflow.readthedocs.io/en/latest/QUINTintro.html" >QUINT workflow.</a>  Quint helps you register, segment and quantify brain wide datasets!
+
 ## Web Application
 If you would like to use DeepSlice but don't need your own personal installation, check out [**DeepSlice Flask**](https://www.DeepSlice.com.au), a fully functional web application which will allow you to upload your dataset and download the aligned results. The web interface was developed by [Michael Pegios](https://github.com/ThermoDev/).
 ## [Installation: How to install DeepSlice](#installation)
