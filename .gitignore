@@ -17,3 +17,21 @@ DeepSlice/metadata/weights/*.hdf5
 setup.py
 setup.cfg
 dist
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
