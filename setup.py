@@ -10,7 +10,7 @@ long_description = (this_directory / "README.md").read_text()
 setup(
     name='DeepSlice',
     packages=find_packages(),
-    version='1.0.6',
+    version='{{VERSION_PLACEHOLDER}}',
     license='GPL-3.0',
     description='A package to align histology to 3D brain atlases',
     long_description=long_description,
@@ -20,7 +20,7 @@ setup(
     include_package_data=True,
     author_email='harry.carey@medisin.uio.no',
     url='https://github.com/PolarBean/DeepSlice',
-    download_url='https://github.com/PolarBean/DeepSlice/archive/refs/tags/1.0.6.tar.gz',
+    download_url='https://github.com/PolarBean/DeepSlice/archive/refs/tags/{{VERSION_PLACEHOLDER}}.tar.gz',
     keywords=['histology', 'brain', 'atlas', 'alignment'],
     install_requires=[
         'numpy',
