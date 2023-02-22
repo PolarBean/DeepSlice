@@ -14,8 +14,7 @@ utilities/__pycache__/QuickNII_functions.cpython-37.pyc
 DeepSlice/metadata/volumes/*.nii
 DeepSlice/metadata/weights/*.h5
 DeepSlice/metadata/weights/*.hdf5
-setup.py
-setup.cfg
+
 dist
 # Distribution / packaging
 bin/
