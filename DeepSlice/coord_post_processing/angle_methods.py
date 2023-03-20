@@ -9,6 +9,7 @@ def calculate_brain_center_coordinate(section, atlas_shape, axis):
     dimensions not orthogonal to the dimension along which the series is being aligned.
     for example, if the series is being aligned coronally then this will return the midpoint
     in X and Z as coronal series are spaced along the Y coordinate in the CCF.
+
     :param section: The section to calculate the center for
     :param atlas_shape: The shape of the atlas
     :param axis: The axis along which the series is being aligned ('sagittal', 'coronal', 'horizontal')
@@ -38,6 +39,7 @@ def calculate_brain_center_coordinate(section, atlas_shape, axis):
 def calculate_angles(df):
     """
     Calculates the Mediolateral and Dorsoventral angles for a series of predictions
+    
     :param df: The dataframe containing the predictions
     :type df: pandas.DataFrame
     :return: a list of calculated ML and DV angles

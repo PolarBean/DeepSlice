@@ -9,6 +9,7 @@ def trim_mean(arr: np.array, percent: int) -> float:
     """"
     Calculates the trimmed mean of an array, sourced from:
     https://gist.github.com/StuffbyYuki/6f25f9f2f302cb5c1e82e4481016ccde
+
     :param arr: the array to calculate the trimmed mean of
     :type arr: np.array
     :param percent: the percentage of values to trim
@@ -26,6 +27,7 @@ def calculate_average_section_thickness(
 ) -> float:
     """
     Calculates the average section thickness for a series of predictions
+
     :param section_numbers: List of section numbers
     :param section_depth: List of section depths
     :type section_numbers: List[int, float]
@@ -54,6 +56,7 @@ def ideal_spacing(
 ) -> float:
     """
     Calculates the ideal spacing for a series of predictions
+
     :param section_numbers: List of section numbers
     :param section_depth: List of section depths
     :param average_thickness: The average section thickness
@@ -79,6 +82,7 @@ def ideal_spacing(
 def determine_direction_of_indexing(depth: List[Union[int, float]]) -> str:
     """
     Determines the direction of indexing for a series of predictions
+
     :param depth: List of depths sorted by section index
     :type depth: List[int, float]
     :return: the direction of indexing
@@ -95,6 +99,7 @@ def determine_direction_of_indexing(depth: List[Union[int, float]]) -> str:
 def enforce_section_ordering(predictions):
     """
     Ensures that the predictions are ordered by section number
+
     :param predictions: dataframe of predictions
     :type predictions: pandas.DataFrame
     :return: the input dataframe ordered by section number
@@ -131,6 +136,7 @@ def space_according_to_index(predictions, section_thickness = None, voxel_size =
     Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
     cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
     indexes must be 1, 2, 4).
+
     :param predictions: dataframe of predictions
     :type predictions: pandas.DataFrame
     :return: the input dataframe with evenly spaced sections
@@ -168,6 +174,7 @@ def space_according_to_index(predictions, section_thickness = None, voxel_size =
 def number_sections(filenames: List[str], legacy=False) -> List[int]:
     """
     returns the section numbers of filenames
+
     :param filenames: list of filenames
     :type filenames: list[str]
     :return: list of section numbers
@@ -197,6 +204,7 @@ def number_sections(filenames: List[str], legacy=False) -> List[int]:
 def set_bad_sections_util(df: pd.DataFrame, bad_sections: List[str]) -> pd.DataFrame:
     """
     Sets the damaged sections and sections which deepslice may not perform well on for a series of predictions
+    
     :param bad_sections: List of bad sections
     :param df: dataframe of predictions
     :type bad_sections: List[int]

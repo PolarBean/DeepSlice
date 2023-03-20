@@ -5,6 +5,7 @@ from .plane_alignment_functions import plane_alignment
 def calculate_brain_center_depth(section):
     """
     Calculates the depth of the brain center for a given section
+
     :param section: the section coordinates as an array consisting of Oxyz,Uxyz,Vxyz 
     :type section: np.array
     :return: the depth of the brain center
@@ -23,6 +24,7 @@ def calculate_brain_center_depth(section):
 def calculate_brain_center_depths(predictions):
     """
     Calculates the depths of the brain center for a series of predictions
+    
     :param predictions: dataframe of predictions
     :type predictions: pandas.DataFrame
     :return: a list of depths
