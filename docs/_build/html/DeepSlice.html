@@ -44,22 +44,20 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">DeepSlice package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-DeepSlice.main">DeepSlice.main module</a><ul>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel"><code class="docutils literal notranslate"><span class="pre">DSModel</span></code></a><ul>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel.adjust_angles"><code class="docutils literal notranslate"><span class="pre">DSModel.adjust_angles()</span></code></a></li>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel.enforce_index_order"><code class="docutils literal notranslate"><span class="pre">DSModel.enforce_index_order()</span></code></a></li>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel.enforce_index_spacing"><code class="docutils literal notranslate"><span class="pre">DSModel.enforce_index_spacing()</span></code></a></li>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel.load_QUINT"><code class="docutils literal notranslate"><span class="pre">DSModel.load_QUINT()</span></code></a></li>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel.predict"><code class="docutils literal notranslate"><span class="pre">DSModel.predict()</span></code></a></li>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel.propagate_angles"><code class="docutils literal notranslate"><span class="pre">DSModel.propagate_angles()</span></code></a></li>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel.save_predictions"><code class="docutils literal notranslate"><span class="pre">DSModel.save_predictions()</span></code></a></li>
-<li><a class="reference internal" href="#DeepSlice.main.DSModel.set_bad_sections"><code class="docutils literal notranslate"><span class="pre">DSModel.set_bad_sections()</span></code></a></li>
+<li><a class="reference internal" href="#module-DeepSlice">Module contents</a><ul>
+<li><a class="reference internal" href="#DeepSlice.DSModel"><code class="docutils literal notranslate"><span class="pre">DSModel</span></code></a><ul>
+<li><a class="reference internal" href="#DeepSlice.DSModel.adjust_angles"><code class="docutils literal notranslate"><span class="pre">DSModel.adjust_angles()</span></code></a></li>
+<li><a class="reference internal" href="#DeepSlice.DSModel.enforce_index_order"><code class="docutils literal notranslate"><span class="pre">DSModel.enforce_index_order()</span></code></a></li>
+<li><a class="reference internal" href="#DeepSlice.DSModel.enforce_index_spacing"><code class="docutils literal notranslate"><span class="pre">DSModel.enforce_index_spacing()</span></code></a></li>
+<li><a class="reference internal" href="#DeepSlice.DSModel.load_QUINT"><code class="docutils literal notranslate"><span class="pre">DSModel.load_QUINT()</span></code></a></li>
+<li><a class="reference internal" href="#DeepSlice.DSModel.predict"><code class="docutils literal notranslate"><span class="pre">DSModel.predict()</span></code></a></li>
+<li><a class="reference internal" href="#DeepSlice.DSModel.propagate_angles"><code class="docutils literal notranslate"><span class="pre">DSModel.propagate_angles()</span></code></a></li>
+<li><a class="reference internal" href="#DeepSlice.DSModel.save_predictions"><code class="docutils literal notranslate"><span class="pre">DSModel.save_predictions()</span></code></a></li>
+<li><a class="reference internal" href="#DeepSlice.DSModel.set_bad_sections"><code class="docutils literal notranslate"><span class="pre">DSModel.set_bad_sections()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-DeepSlice">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -90,21 +88,18 @@
              
   <section id="deepslice-package">
 <h1>DeepSlice package<a class="headerlink" href="#deepslice-package" title="Permalink to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</section>
-<section id="module-DeepSlice.main">
-<span id="deepslice-main-module"></span><h2>DeepSlice.main module<a class="headerlink" href="#module-DeepSlice.main" title="Permalink to this heading"></a></h2>
+<section id="module-DeepSlice">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-DeepSlice" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">DeepSlice.main.</span></span><span class="sig-name descname"><span class="pre">DSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">DeepSlice.</span></span><span class="sig-name descname"><span class="pre">DSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Initialises a DeepSlice model for a given species
 :param species: the species of the brain to be processed, must be one of “mouse”, “rat”
 :type species: str</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel.adjust_angles">
-<span class="sig-name descname"><span class="pre">adjust_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ML</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DV</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel.adjust_angles" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel.adjust_angles">
+<span class="sig-name descname"><span class="pre">adjust_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ML</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DV</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel.adjust_angles" title="Permalink to this definition"></a></dt>
 <dd><p>Adjusts the Mediolateral (ML) and Dorsoventral (DV) angles of all sections to the specified values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -117,14 +112,14 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel.enforce_index_order">
-<span class="sig-name descname"><span class="pre">enforce_index_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel.enforce_index_order" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel.enforce_index_order">
+<span class="sig-name descname"><span class="pre">enforce_index_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel.enforce_index_order" title="Permalink to this definition"></a></dt>
 <dd><p>reorders the section depths (oy) in the predictions such that they align with the section indexes</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel.enforce_index_spacing">
-<span class="sig-name descname"><span class="pre">enforce_index_spacing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section_thickness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel.enforce_index_spacing" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel.enforce_index_spacing">
+<span class="sig-name descname"><span class="pre">enforce_index_spacing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section_thickness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel.enforce_index_spacing" title="Permalink to this definition"></a></dt>
 <dd><p>Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
 cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
 indexes must be 1, 2, 4).</p>
@@ -136,8 +131,8 @@ indexes must be 1, 2, 4).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel.load_QUINT">
-<span class="sig-name descname"><span class="pre">load_QUINT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel.load_QUINT" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel.load_QUINT">
+<span class="sig-name descname"><span class="pre">load_QUINT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel.load_QUINT" title="Permalink to this definition"></a></dt>
 <dd><p>Load a QUINT compatible JSON or XML.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -147,8 +142,8 @@ indexes must be 1, 2, 4).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_numbers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_section_numbers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel.predict" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_numbers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_section_numbers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel.predict" title="Permalink to this definition"></a></dt>
 <dd><p>predicts the atlas position for a folder full of histological brain sections</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -163,14 +158,14 @@ indexes must be 1, 2, 4).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel.propagate_angles">
-<span class="sig-name descname"><span class="pre">propagate_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'weighted_mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel.propagate_angles" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel.propagate_angles">
+<span class="sig-name descname"><span class="pre">propagate_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'weighted_mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel.propagate_angles" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the average Mediolateral and Dorsoventral angles for all sections.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel.save_predictions">
-<span class="sig-name descname"><span class="pre">save_predictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel.save_predictions" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel.save_predictions">
+<span class="sig-name descname"><span class="pre">save_predictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel.save_predictions" title="Permalink to this definition"></a></dt>
 <dd><p>Save the predictions to a QuickNII compatible JSON file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -180,8 +175,8 @@ indexes must be 1, 2, 4).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="DeepSlice.main.DSModel.set_bad_sections">
-<span class="sig-name descname"><span class="pre">set_bad_sections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bad_sections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.main.DSModel.set_bad_sections" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="DeepSlice.DSModel.set_bad_sections">
+<span class="sig-name descname"><span class="pre">set_bad_sections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bad_sections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DeepSlice.DSModel.set_bad_sections" title="Permalink to this definition"></a></dt>
 <dd><p>sets the bad sections for a given brain. Must be run after predict()</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -192,9 +187,6 @@ indexes must be 1, 2, 4).</p>
 
 </dd></dl>
 
-</section>
-<section id="module-DeepSlice">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-DeepSlice" title="Permalink to this heading"></a></h2>
 </section>
 </section>
 
