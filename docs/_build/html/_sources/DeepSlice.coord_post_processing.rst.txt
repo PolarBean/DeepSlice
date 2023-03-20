@@ -1,0 +1,45 @@
+DeepSlice.coord\_post\_processing package
+=========================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   DeepSlice.coord_post_processing.plane_alignment_functions
+
+Submodules
+----------
+
+DeepSlice.coord\_post\_processing.angle\_methods module
+-------------------------------------------------------
+
+.. automodule:: DeepSlice.coord_post_processing.angle_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DeepSlice.coord\_post\_processing.depth\_estimation module
+----------------------------------------------------------
+
+.. automodule:: DeepSlice.coord_post_processing.depth_estimation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DeepSlice.coord\_post\_processing.spacing\_and\_indexing module
+---------------------------------------------------------------
+
+.. automodule:: DeepSlice.coord_post_processing.spacing_and_indexing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: DeepSlice.coord_post_processing
+   :members:
+   :undoc-members:
+   :show-inheritance:

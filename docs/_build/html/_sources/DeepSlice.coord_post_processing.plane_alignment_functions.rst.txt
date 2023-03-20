@@ -1,0 +1,21 @@
+DeepSlice.coord\_post\_processing.plane\_alignment\_functions package
+=====================================================================
+
+Submodules
+----------
+
+DeepSlice.coord\_post\_processing.plane\_alignment\_functions.plane\_alignment module
+-------------------------------------------------------------------------------------
+
+.. automodule:: DeepSlice.coord_post_processing.plane_alignment_functions.plane_alignment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: DeepSlice.coord_post_processing.plane_alignment_functions
+   :members:
+   :undoc-members:
+   :show-inheritance:

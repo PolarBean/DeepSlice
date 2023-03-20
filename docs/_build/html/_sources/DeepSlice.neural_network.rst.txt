@@ -1,0 +1,29 @@
+DeepSlice.neural\_network package
+=================================
+
+Submodules
+----------
+
+DeepSlice.neural\_network.network\_architecture module
+------------------------------------------------------
+
+.. automodule:: DeepSlice.neural_network.network_architecture
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DeepSlice.neural\_network.neural\_network module
+------------------------------------------------
+
+.. automodule:: DeepSlice.neural_network.neural_network
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: DeepSlice.neural_network
+   :members:
+   :undoc-members:
+   :show-inheritance:
