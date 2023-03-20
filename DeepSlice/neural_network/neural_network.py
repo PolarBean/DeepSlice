@@ -17,6 +17,7 @@ import struct
 def gray_scale(img: np.ndarray) -> np.ndarray:
     """
     Convert the image to grayscale
+
     :param img: The image to convert
     :type img: numpy.ndarray
     :return: The converted image
@@ -29,6 +30,7 @@ def gray_scale(img: np.ndarray) -> np.ndarray:
 def initialise_network(xception_weights: str, weights: str) -> Sequential:
     """
     Initialise a neural network with the given weights
+
     :param weights: The weights for the network
     :type weights: list
     :return: The initialised neural network
@@ -52,6 +54,7 @@ def initialise_network(xception_weights: str, weights: str) -> Sequential:
 def load_images(image_path: str) -> np.ndarray:
     """
     Load the images from the given path
+
     :param image_path: The path to the images
     :type image_path: str
     :return: an Image generator for the found images
@@ -99,6 +102,7 @@ def predictions_util(
 ):
     """
     Predict the image alignments
+    
     :param model: The model to use for prediction
     :param image_generator: The image generator to use for prediction
     :type model: keras.models.Sequential

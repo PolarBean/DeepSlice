@@ -61,6 +61,7 @@ def write_QuickNII_XML(df: pd.DataFrame, filename: str, aligner: str) -> None:
 def read_QuickNII_XML(filename: str) -> pd.DataFrame:
     """
     Converts a QuickNII XML to a pandas dataframe
+
     :param xml: The path to the QuickNII XML
     :type xml: str
     :return: A pandas dataframe
@@ -124,6 +125,7 @@ def write_QUINT_JSON(
 def read_QUINT_JSON(filename: str) -> pd.DataFrame:
     """
     Converts a QUINT JSON to a pandas dataframe
+    
     :param json: The path to the QUINT JSON
     :type json: str
     :return: A pandas dataframe

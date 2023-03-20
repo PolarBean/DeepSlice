@@ -9,6 +9,10 @@ from .metadata import metadata_loader
 
 class DSModel:
     def __init__(self, species):
+        """Initialises a DeepSlice model for a given species
+        :param species: the species of the brain to be processed, must be one of "mouse", "rat"
+        :type species: str
+        """
         self.species = species
 
         self.config, self.metadata_path = metadata_loader.load_config()
@@ -79,6 +83,7 @@ class DSModel:
     def set_bad_sections(self, bad_sections: list):
         """
         sets the bad sections for a given brain. Must be run after predict()
+
         :param bad_sections: A list of bad sections to ignore when calculating angles and spacing
         :type bad_sections: list
         """
@@ -99,6 +104,7 @@ class DSModel:
         Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
         cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
         indexes must be 1, 2, 4).
+
         :param section_thickness: the thickness of the sections in microns, defaults to None
         :type section_thickness: Union[int, float], optional
         """
@@ -110,6 +116,7 @@ class DSModel:
     def adjust_angles(self, ML: Union[int, float], DV: Union[int, float]):
         """
         Adjusts the Mediolateral (ML) and Dorsoventral (DV) angles of all sections to the specified values.
+
         :param ML: the Mediolateral angle to set
         :param DV: the Dorsoventral angle to set
         :type ML: [int, float]
@@ -131,6 +138,7 @@ class DSModel:
     def load_QUINT(self, filename):
         """
         Load a QUINT compatible JSON or XML.
+
         :param filename: the name of the file to load
         :type filename: str
         """
@@ -150,6 +158,7 @@ class DSModel:
     def save_predictions(self, filename):
         """
         Save the predictions to a QuickNII compatible JSON file.
+
         :param filename: the name of the file to save to
         :type filename: str
         """
