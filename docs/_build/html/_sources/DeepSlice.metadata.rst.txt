@@ -1,0 +1,21 @@
+DeepSlice.metadata package
+==========================
+
+Submodules
+----------
+
+DeepSlice.metadata.metadata\_loader module
+------------------------------------------
+
+.. automodule:: DeepSlice.metadata.metadata_loader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: DeepSlice.metadata
+   :members:
+   :undoc-members:
+   :show-inheritance:

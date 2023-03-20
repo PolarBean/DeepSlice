@@ -1,0 +1,21 @@
+DeepSlice.read\_and\_write package
+==================================
+
+Submodules
+----------
+
+DeepSlice.read\_and\_write.QuickNII\_functions module
+-----------------------------------------------------
+
+.. automodule:: DeepSlice.read_and_write.QuickNII_functions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: DeepSlice.read_and_write
+   :members:
+   :undoc-members:
+   :show-inheritance:
