@@ -81,11 +81,12 @@ def get_mean_angle(DV_list, ML_list, method, depths=None, species=None):
             min, max = 0, 528
         elif species == "rat":
             min, max = 0, 1024
-        if len(DV_list) > 2:
+        if len(df_center) > 2:
             weighted_accuracy = plane_alignment.make_gaussian_weights(min, max)
         else:
-            weighted_accuracy = [1.0] * len(DV_list)
+            weighted_accuracy = [1.0] * len(df_center)
         weighted_accuracy = [weighted_accuracy[int(y)] for y in df_center]
+        print(weighted_accuracy)
         DV_angle = np.average(DV_list, weights=weighted_accuracy)
         ML_angle = np.average(ML_list, weights=weighted_accuracy)
     else:
