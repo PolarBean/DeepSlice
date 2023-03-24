@@ -45,6 +45,9 @@ def calculate_average_section_thickness(
     weighted_accuracy = plane_alignment.make_gaussian_weights(min, max + 1)
     weighted_accuracy = [weighted_accuracy[int(y)] for y in section_numbers]
     section_thicknesses = depth_spacing / number_spacing
+    if len(section_numbers) <= 2:
+      weighted_accuracy = [1, 1]
+
     average_thickness = np.average(section_thicknesses, weights = weighted_accuracy[1:])
     return average_thickness
 
@@ -73,6 +76,8 @@ def ideal_spacing(
     max = np.max(section_numbers)
     weighted_accuracy = plane_alignment.make_gaussian_weights(min, max + 1)
     weighted_accuracy = [weighted_accuracy[int(y)] for y in section_numbers]
+    if len(section_numbers) <= 2:
+        weighted_accuracy = [0.5, 0.5]
     distance_to_ideal = np.average(section_depth - index_spaced_depth, weights = weighted_accuracy)
     # adjust the evenly spaced depths to minimise their distance to the predicted depths
     ideal_index_spaced_depth = index_spaced_depth + distance_to_ideal
