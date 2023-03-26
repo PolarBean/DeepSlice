@@ -82,7 +82,7 @@ def get_mean_angle(DV_list, ML_list, method, depths=None, species=None):
         elif species == "rat":
             min, max = 0, 1024
         if len(df_center) > 2:
-            weighted_accuracy = plane_alignment.make_gaussian_weights(min, max)
+            weighted_accuracy = plane_alignment.make_gaussian_weights(max)
         else:
             weighted_accuracy = [1.0] * len(df_center)
         weighted_accuracy = [weighted_accuracy[int(y)] for y in df_center]

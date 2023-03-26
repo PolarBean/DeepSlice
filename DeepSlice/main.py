@@ -99,7 +99,7 @@ class DSModel:
             self.predictions
         )
 
-    def enforce_index_spacing(self, section_thickness:Union[int, float] = None):
+    def enforce_index_spacing(self, section_thickness:Union[int, float] = None, suppress = False):
         """
         Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
         cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
@@ -110,7 +110,7 @@ class DSModel:
         """
         voxel_size = self.config["target_volumes"][self.species]["voxel_size_microns"]
         self.predictions = spacing_and_indexing.space_according_to_index(
-            self.predictions, section_thickness = section_thickness, voxel_size = voxel_size
+            self.predictions, section_thickness = section_thickness, voxel_size = voxel_size, suppress = suppress, species=self.species
         )
 
     def adjust_angles(self, ML: Union[int, float], DV: Union[int, float]):
@@ -152,6 +152,8 @@ class DSModel:
                 print("switching to a rat model")
         elif filename.lower().endswith('.xml'):
             predictions = QuickNII_functions.read_QuickNII_XML(filename)
+        else:
+            raise ValueError('File must be a JSON or XML')
         self.predictions = predictions
         
 

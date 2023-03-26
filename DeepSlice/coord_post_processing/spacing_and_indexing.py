@@ -23,7 +23,8 @@ def trim_mean(arr: np.array, percent: int) -> float:
 
 
 def calculate_average_section_thickness(
-    section_numbers: List[Union[int, float]], section_depth: List[Union[int, float]]
+    section_numbers: List[Union[int, float]], section_depth: List[Union[int, float]], method="weighted",
+    species="mouse"
 ) -> float:
     """
     Calculates the average section thickness for a series of predictions
@@ -42,12 +43,19 @@ def calculate_average_section_thickness(
     # dividing depth spacing by number spacing allows us to control for missing sections
     min = 0
     max = np.max(section_numbers)
-    weighted_accuracy = plane_alignment.make_gaussian_weights(min, max + 1)
-    weighted_accuracy = [weighted_accuracy[int(y)] for y in section_numbers]
+    if species == "mouse":
+        min, max = 0, 528
+    elif species == "rat":
+        min, max = 0, 1024
+    if method == "weighted":
+        weighted_accuracy = plane_alignment.make_gaussian_weights(max + 1)
+        weighted_accuracy = [weighted_accuracy[int(y)] for y in section_numbers]
+    elif method == None:
+        weighted_accuracy = [1 for y in section_numbers]
+
     section_thicknesses = depth_spacing / number_spacing
     if len(section_numbers) <= 2:
       weighted_accuracy = [1, 1]
-
     average_thickness = np.average(section_thicknesses, weights = weighted_accuracy[1:])
     return average_thickness
 
@@ -56,6 +64,8 @@ def ideal_spacing(
     section_numbers: List[Union[int, float]],
     section_depth: List[Union[int, float]],
     average_thickness: Union[int, float],
+    method = "weighted",
+    species = "mouse"
 ) -> float:
     """
     Calculates the ideal spacing for a series of predictions
@@ -74,8 +84,15 @@ def ideal_spacing(
     # average distance between the depths and the evenly spaced depths
     min = 0
     max = np.max(section_numbers)
-    weighted_accuracy = plane_alignment.make_gaussian_weights(min, max + 1)
-    weighted_accuracy = [weighted_accuracy[int(y)] for y in section_numbers]
+    if species == "mouse":
+        min, max = 0, 528
+    elif species == "rat":
+        min, max = 0, 1024
+    if method == "weighted":
+        weighted_accuracy = plane_alignment.make_gaussian_weights(max + 1)
+        weighted_accuracy = [weighted_accuracy[int(y)] for y in section_numbers]
+    elif method == None:
+        weighted_accuracy = [1 for y in section_numbers]
     if len(section_numbers) <= 2:
         weighted_accuracy = [0.5, 0.5]
     distance_to_ideal = np.average(section_depth - index_spaced_depth, weights = weighted_accuracy)
@@ -136,7 +153,7 @@ def enforce_section_ordering(predictions):
     return predictions
 
 
-def space_according_to_index(predictions, section_thickness = None, voxel_size = None):
+def space_according_to_index(predictions, section_thickness = None, voxel_size = None, suppress = False, species = "mouse"):
     """
     Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
     cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
@@ -164,13 +181,15 @@ def space_according_to_index(predictions, section_thickness = None, voxel_size =
         depths = np.array(depths)
         if not section_thickness:
             section_thickness = calculate_average_section_thickness(
-                predictions["nr"], depths
+                predictions["nr"], section_depth = depths, species=species
             )
-            print(f'predicted thickness is {section_thickness * voxel_size}µm')
+            if not suppress:
+                print(f'predicted thickness is {section_thickness * voxel_size}µm')
         else:
-            print(f'specified thickness is {section_thickness * voxel_size}µm')
+            if not suppress:
+                print(f'specified thickness is {section_thickness * voxel_size}µm')
 
-        calculated_spacing = ideal_spacing(predictions["nr"], depths, section_thickness)
+        calculated_spacing = ideal_spacing(predictions["nr"], depths, section_thickness, "weighted", species)
         distance_to_ideal = calculated_spacing - depths
         predictions["oy"] = predictions["oy"] + distance_to_ideal
     return predictions
