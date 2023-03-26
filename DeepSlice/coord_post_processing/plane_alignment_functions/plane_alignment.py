@@ -1,6 +1,7 @@
-import random
 from statistics import mean
 import numpy as np
+from scipy.stats import norm
+
 import math
 
 
@@ -94,28 +95,11 @@ def rotation_around_axis(axis, angle):
     )
 
 
-def make_gaussian_weights(mini, maxi):
-    """
-    Generates a list of weights for a gaussian distribution
-    :param mini: the minimum value of the distribution
-    :type mini: float
-    :param maxi: the maximum value of the distribution
-    :type maxi: float
-    :returns: a list of weights
-    :rtype: list
-    """
-    weights = []
-    center = mean((mini, maxi))
-    quartile = (maxi - mini) / 4
-    while len(weights) < ((maxi - mini) / 2):
-        weights.append(random.gauss(center, quartile))
-    weights = [max(x, mini) for x in weights]
-    weights = [min(x, maxi) for x in weights]
-    weights = [x - center if x > center else x for x in weights]
-    weights = sorted(weights)
-    weights_rev = sorted(weights, reverse=True)
-    weights.extend(weights_rev)
-    return [x / max(weights) for x in weights]
+
+def make_gaussian_weights(size):
+    x = np.linspace(-np.pi, np.pi, size)
+    weights = np.exp(-(x ** 2) / 2) / np.sqrt(2 * np.pi)
+    return weights
 
 
 def get_axis(m, translation_vector, direction, plane_of_section=None, atlas="AMBA"):
