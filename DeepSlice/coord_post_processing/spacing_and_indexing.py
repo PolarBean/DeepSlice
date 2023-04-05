@@ -176,7 +176,7 @@ def space_according_to_index(predictions, section_thickness = None, voxel_size =
             "No section indexes found, cannot space according to a missing index. You likely did not run predict() with section_numbers=True"
         )
     else:
-        # predictions = enforce_section_ordering(predictions)
+        predictions = enforce_section_ordering(predictions)
         depths = calculate_brain_center_depths(predictions)
         depths = np.array(depths)
         if not section_thickness:
