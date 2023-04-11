@@ -18,11 +18,8 @@ class DSModel:
         self.config, self.metadata_path = metadata_loader.load_config()
         xception_weights =   metadata_loader.get_data_path(self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path)
         weights =    metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
-        try:
-          self.model = neural_network.initialise_network(xception_weights, weights)
-        except:
-            self.model = neural_network.initialise_network(xception_weights, weights)
-        self.weights = weights
+        self.model = neural_network.initialise_network(xception_weights, weights, self.species)
+        
 
 
     def predict(
@@ -155,6 +152,10 @@ class DSModel:
         else:
             raise ValueError('File must be a JSON or XML')
         self.predictions = predictions
+        xception_weights =   metadata_loader.get_data_path(self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path)
+        weights =    metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
+        self.model = neural_network.initialise_network(xception_weights, weights, self.species) 
+
         
 
     def save_predictions(self, filename):
