@@ -27,23 +27,33 @@ def gray_scale(img: np.ndarray) -> np.ndarray:
     return img
 
 
-def initialise_network(xception_weights: str, weights: str) -> Sequential:
+def initialise_network(xception_weights: str, weights: str, species: str) -> Sequential:
     """
     Initialise a neural network with the given weights
 
     :param weights: The weights for the network
     :type weights: list
+    :param species: The species of the animal, this is necessary because of a previous error where the models are slightly different for different species
     :return: The initialised neural network
     :rtype: keras.models.Sequential
     """
     base_model = Xception(include_top=True, weights=xception_weights)
     base_model._layers.pop()
     base_model._layers.pop()
-    model = Sequential()
-    model.add(base_model)
-    model.add(Dense(256, activation="relu"))
-    model.add(Dense(256, activation="relu"))
-    model.add(Dense(9, activation="linear"))
+    if species == "rat":
+        inputs = Input(shape=(299, 299, 3))
+        base_model_layer = base_model(inputs, training=True)
+        dense1_layer = Dense(256, activation="relu")(base_model_layer)
+        dense2_layer = Dense(256, activation="relu")(dense1_layer)
+        output_layer = Dense(9, activation="linear")(dense2_layer)
+        model = Model(inputs=inputs, outputs=output_layer)
+    else:
+        model = Sequential()
+        model.add(base_model)
+        model.add(Dense(256, activation="relu"))
+        model.add(Dense(256, activation="relu"))
+        model.add(Dense(9, activation="linear"))
+
     if weights != None:
         model.load_weights(weights)
     return model
