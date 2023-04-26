@@ -111,6 +111,7 @@ def propagate_angles(df, method, species):
     DV_angle, ML_angle = get_mean_angle(
         DV_angle_list, ML_angle_list, method, depths, species
     )
+    print(f"DV angle: {DV_angle}\nML angle: {ML_angle}")
     # adjust the angles for each section in the dataset
     df = set_angles(df, DV_angle, ML_angle)
     return df

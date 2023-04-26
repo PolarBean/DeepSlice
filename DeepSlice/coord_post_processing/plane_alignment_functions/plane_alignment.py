@@ -99,6 +99,8 @@ def rotation_around_axis(axis, angle):
 def make_gaussian_weights(size):
     x = np.linspace(-np.pi, np.pi, size)
     weights = np.exp(-(x ** 2) / 2) / np.sqrt(2 * np.pi)
+    weights[weights>size-1] = size-1
+    weights[weights<0] = 0
     return weights
 
 
