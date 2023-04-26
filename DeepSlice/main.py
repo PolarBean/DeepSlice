@@ -24,10 +24,11 @@ class DSModel:
 
     def predict(
         self,
-        image_directory: str,
+        image_directory: str = None,
         ensemble: bool = None,
         section_numbers: bool = True,
         legacy_section_numbers=False,
+        image_list = None
     ):
         """predicts the atlas position for a folder full of histological brain sections
 
