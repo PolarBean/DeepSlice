@@ -47,8 +47,18 @@ class DSModel:
         if ensemble == None:
             ensemble = self.config["ensemble_status"][self.species]
             ensemble = eval(ensemble)
-
-        image_generator, width, height = neural_network.load_images(image_directory)
+        if image_list:
+            image_generator, width, height = neural_network.load_images_from_list(
+                image_list
+            )
+            if image_directory:
+                print(
+                    "WARNING: image_directory is set but image_list is also set. image_directory will be ignored."
+                )
+        else:
+            image_generator, width, height = neural_network.load_images_from_path(
+                image_directory
+            )
         primary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
  
         secondary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["secondary"], self.metadata_path)

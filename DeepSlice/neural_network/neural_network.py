@@ -60,10 +60,10 @@ def initialise_network(xception_weights: str, weights: str, species: str) -> Seq
 
 
 
-def load_images(image_path: str) -> np.ndarray:
+
+def load_images_from_path(image_path: str) -> np.ndarray:
     """
     Load the images from the given path
-
     :param image_path: The path to the images
     :type image_path: str
     :return: an Image generator for the found images
@@ -94,13 +94,46 @@ def load_images(image_path: str) -> np.ndarray:
             y_col=None,
             target_size=(299, 299),
             batch_size=1,
-            
             colormode="rgb",
             shuffle=False,
             class_mode=None,
         )
     return image_generator, width, height
-
+    
+def load_images_from_list(image_list: list) -> np.ndarray:
+    """
+    Load the images from the given list
+    :param image_list: The list of images
+    :type image_list: list
+    :return: an Image generator for the found images
+    :rtype: keras.preprocessing.image.ImageDataGenerator
+    """
+    valid_formats = [".jpg", ".jpeg", ".png"]
+    images = [i for i in image_list if os.path.splitext(i)[1].lower() in valid_formats]
+    sizes = [get_image_size(i) for i in images]
+    width = [i[0] for i in sizes]
+    height = [i[1] for i in sizes]
+    if len(images) == 0:
+        raise ValueError(
+            f"No images found in the directory, please ensure image files are one of the following formats: {', '.join(valid_formats)}"
+        )
+    image_df = pd.DataFrame({"Filenames": images})
+    with warnings.catch_warnings():
+        ##throws warning about samplewise_std_normalization conflicting with samplewise_center which we don't use.
+        warnings.simplefilter("ignore")
+        image_generator = ImageDataGenerator(
+            preprocessing_function=gray_scale, samplewise_std_normalization=True
+        ).flow_from_dataframe(
+            image_df,
+            x_col="Filenames",
+            y_col=None,
+            target_size=(299, 299),
+            batch_size=1,
+            colormode="rgb",
+            shuffle=False,
+            class_mode=None,
+        )
+    return image_generator, width, height
 
 def predictions_util(
     model: Sequential,
