@@ -85,6 +85,9 @@ def get_mean_angle(DV_list, ML_list, method, depths=None, species=None):
             weighted_accuracy = plane_alignment.make_gaussian_weights(max)
         else:
             weighted_accuracy = [1.0] * len(df_center)
+        df_center = np.array(df_center)
+        df_center[df_center < min] = min
+        df_center[df_center > max] = max-1
         weighted_accuracy = [weighted_accuracy[int(y)] for y in df_center]
         print(weighted_accuracy)
         DV_angle = np.average(DV_list, weights=weighted_accuracy)
