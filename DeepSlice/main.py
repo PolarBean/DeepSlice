@@ -24,10 +24,12 @@ class DSModel:
 
     def predict(
         self,
-        image_directory: str,
+        image_directory: str = None,
         ensemble: bool = None,
         section_numbers: bool = True,
         legacy_section_numbers=False,
+        image_list = None,
+        use_secondary_model = False,
     ):
         """predicts the atlas position for a folder full of histological brain sections
 
@@ -47,18 +49,40 @@ class DSModel:
         if ensemble == None:
             ensemble = self.config["ensemble_status"][self.species]
             ensemble = eval(ensemble)
-
-        image_generator, width, height = neural_network.load_images(image_directory)
+        if image_list:
+            image_generator, width, height = neural_network.load_images_from_list(
+                image_list
+            )
+            if image_directory:
+                print(
+                    "WARNING: image_directory is set but image_list is also set. image_directory will be ignored."
+                )
+        else:
+            image_generator, width, height = neural_network.load_images_from_path(
+                image_directory
+            )
         primary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
  
         secondary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["secondary"], self.metadata_path)
 
         if secondary_weights == "None":
             print(f"ensemble is not available for {self.species}")
+            if use_secondary_model:
+                print("WARNING: use_secondary_model is set but no secondary model is available. use_secondary_model will be ignored.")
+                use_secondary_model = False
             ensemble = False
-        predictions = neural_network.predictions_util(
-            self.model, image_generator, primary_weights, secondary_weights, ensemble
-        )
+        if use_secondary_model and ensemble:
+            print("WARNING: use_secondary_model is set but ensemble is also set. use_secondary_model will be ignored.")
+            use_secondary_model = False
+        if use_secondary_model:
+            print("Using secondary model")
+            predictions = neural_network.predictions_util(
+                self.model, image_generator, secondary_weights,None, ensemble
+            )
+        else:
+            predictions = neural_network.predictions_util(
+                self.model, image_generator, primary_weights, secondary_weights, ensemble
+            )
         predictions["width"] = width
         predictions["height"] = height
         if section_numbers:
