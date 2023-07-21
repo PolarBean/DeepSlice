@@ -19,15 +19,8 @@ jobs:
         # the destination_repo format is
         # https://gitlab_service_account_name:${{ secrets.EBRAINS_GITLAB_ACCESS_TOKEN }}@gitlab.ebrains.eu/name_of_mirror.git
         with:
-          source_repo: "polarbean/DeepSlice"
+          source_repo: "PolarBean/DeepSlice"
           source_branch: "main"
           destination_repo: "https://ghpusher:${{ secrets.EBRAINS_GITLAB_ACCESS_TOKEN }}@gitlab.ebrains.eu/polarbean/DeepSlice.git"
           destination_branch: "main"
-      # this task will push all tags from the source_repo to the destination_repo
-      - name: synctags
-        uses: wei/git-sync@v3
-        with:
-          source_repo: "polarbean/DeepSlice"
-          source_branch: "refs/tags/*"
-          destination_repo: "https://ghpusher:${{ secrets.EBRAINS_GITLAB_ACCESS_TOKEN }}@gitlab.ebrains.eu/polarbean/DeepSlice.git"
-          destination_branch: "refs/tags/*"
+
