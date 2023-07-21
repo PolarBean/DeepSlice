@@ -5,7 +5,7 @@ on:
   push:
     branches: [ main ]
 
-# Configure what will be updated
+
 jobs:
   # set the job name
   to_ebrains:
