@@ -82,8 +82,6 @@ def ideal_spacing(
     # unaligned voxel position of section numbers (evenly spaced depths)
     index_spaced_depth = section_numbers * average_thickness
     # average distance between the depths and the evenly spaced depths
-    min = 0
-    max = np.max(section_numbers)
     if species == "mouse":
         min, max = 0, 528
     elif species == "rat":
