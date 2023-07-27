@@ -101,7 +101,7 @@ class DSModel:
         self.predictions = predictions
         self.image_directory = image_directory
 
-    def set_bad_sections(self, bad_sections: list):
+    def set_bad_sections(self, bad_sections: list, auto = False):
         """
         sets the bad sections for a given brain. Must be run after predict()
 
@@ -109,7 +109,7 @@ class DSModel:
         :type bad_sections: list
         """
         self.predictions = spacing_and_indexing.set_bad_sections_util(
-            self.predictions, bad_sections
+            self.predictions, bad_sections, auto
         )
 
     def enforce_index_order(self):

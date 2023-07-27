@@ -35,3 +35,5 @@ var/
 pip-log.txt
 pip-delete-this-directory.txt
 DeepSlice.egg-info
+test.py
+.vscode/settings.json
