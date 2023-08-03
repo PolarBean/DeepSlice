@@ -1,3 +1,8 @@
+
+
+[![DOI](https://zenodo.org/badge/274122364.svg)](https://zenodo.org/badge/latestdoi/274122364)
+
+
 ![Alt](docs/images/DeepSlice_github_banner.png "DeepSlice Banner")
 DeepSlice is a python library which automatically aligns mouse histology with the allen brain atlas common coordinate framework.
 The alignments are viewable, and refinable, using the [QuickNII](https://www.nitrc.org/projects/quicknii "QuickNII") software package.
