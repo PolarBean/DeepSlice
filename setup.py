@@ -31,7 +31,8 @@ setup(
         'typing',
         'pandas==1.3.5',
         'requests',
-        'protobuf==3.20'
+        'protobuf==3.20',
+        'lxml'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
