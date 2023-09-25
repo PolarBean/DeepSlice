@@ -129,7 +129,8 @@ Model.save_predictions(folderpath + 'MyResults')
 
 
 ```
-
+## Acknowledgements
+We are grateful to Ann Goodchild for her time-saving blunt assessments of many failed prototypes, for the motivation provided by Dr William Redmond, and especially to Veronica Downs, Freja Warner Van Dijk and Jayme McCutcheon, whose Novice alignments were instrumental to this work. We would like to thank Gergely Csúcs for providing his expertise and many atlasing tools. Work in the authors’ laboratories is supported by the National Health & Medical Research Council of Australia, the Hillcrest Foundation, and Macquarie University (SMcM), and from the European Union’s Horizon 2020 Framework Program for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3) and the Research Council of Norway under Grant Agreement No. 269774 (INCF, JGB). We are grateful to Macquarie University for access to their HPC resources, essential for production of early DeepSlice prototypes.
 
 
 
