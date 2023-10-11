@@ -170,7 +170,7 @@ def predictions_util(
         predictions = np.mean([predictions, secondary_predictions], axis=0)
         model.load_weights(primary_weights)
     filenames = image_generator.filenames
-    filenames = [i.split("/")[-1] for i in filenames]
+    filenames = [os.path.basename(i) for i in filenames]
     predictions_df = pd.DataFrame(
         {
             "Filenames": filenames,
