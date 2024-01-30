@@ -32,7 +32,8 @@ setup(
         'pandas==1.3.5',
         'requests',
         'protobuf==3.20',
-        'lxml'
+        'lxml',
+        'urllib3==1.26.6'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
