@@ -12,6 +12,7 @@ from skimage.color import rgb2gray
 import warnings
 import imghdr
 import struct
+import h5py
 
 
 def gray_scale(img: np.ndarray) -> np.ndarray:
