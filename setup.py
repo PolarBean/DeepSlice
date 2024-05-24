@@ -26,7 +26,7 @@ setup(
         'numpy',
         'scikit-learn',
         'scikit-image',
-        'tensorflow==2.13.1',
+        'tensorflow<=2.15.0',
         'h5py',
         'typing',
         'pandas',
