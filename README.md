@@ -32,7 +32,7 @@ If you would like to use DeepSlice but don't need your own personal installation
 <!-- This h2 must be bold  -->
 
 <h2 style="font-weight: bold; text-decoration: underline"> From PIP  </h2>
-This is the easy and recommended way to install DeepSlice. Make sure your env has Python 3.7 installed and then simply:
+This is the easy and recommended way to install DeepSlice, simply:
 
 ```bash
 pip install DeepSlice
@@ -41,7 +41,7 @@ And you're ready to go! 🚀 Check out the PyPi package [here](https://pypi.org/
 
 <h2 style="font-weight: bold; text-decoration: underline"> From Source </h2>
 
-**First** To use DeepSlice you must have python3.7 installed. In order to easily install all the dependancies we recommend using [Anaconda](https://www.anaconda.com/products/individual "Anaconda Installation Files"). 
+**First**  In order to easily install all the dependancies we recommend using [Anaconda](https://www.anaconda.com/products/individual "Anaconda Installation Files"). 
 
 
 **Second** Once anaconda is installed, cd into your cloned DeepSlice directory, then cd into the 'conda_environments' directory, and use our premade environment files to setup your system. 
