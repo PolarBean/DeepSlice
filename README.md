@@ -10,6 +10,8 @@ DeepSlice requires no preprocessing and works on any stain, however we have foun
 At present one limitation is that it only works on Coronally cut sections, we will release an update in the future for sagittal and horizontally cut histology.
 ![Alt](docs/images/process.PNG) 
 DeepSlice automates the process of identifying exactly where in the brain a section lies, it can accomodate non-orthogonal cutting planes and will produce an image specific annotation for each section in your brain.  
+## Citation
+If you use DeepSlice in your work please cite [Carey et al, 2023](https://www.nature.com/articles/s41467-023-41645-4). It may also be useful if you mention the version you use :)
 
 ## Workflow 
 DeepSlice is fully integrated with the <a href="https://quint-workflow.readthedocs.io/en/latest/QUINTintro.html" >QUINT workflow.</a>  Quint helps you register, segment and quantify brain wide datasets! &nbsp; 🐭🧠🔬💻🤖
