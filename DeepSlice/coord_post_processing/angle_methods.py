@@ -89,7 +89,6 @@ def get_mean_angle(DV_list, ML_list, method, depths=None, species=None):
         df_center[df_center < min] = min
         df_center[df_center > max] = max-1
         weighted_accuracy = [weighted_accuracy[int(y)] for y in df_center]
-        print(weighted_accuracy)
         DV_angle = np.average(DV_list, weights=weighted_accuracy)
         ML_angle = np.average(ML_list, weights=weighted_accuracy)
     else:
