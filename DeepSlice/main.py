@@ -77,11 +77,11 @@ class DSModel:
         if use_secondary_model:
             print("Using secondary model")
             predictions = neural_network.predictions_util(
-                self.model, image_generator, secondary_weights,None, ensemble
+                self.model, image_generator, secondary_weights,None, ensemble, self.species
             )
         else:
             predictions = neural_network.predictions_util(
-                self.model, image_generator, primary_weights, secondary_weights, ensemble
+                self.model, image_generator, primary_weights, secondary_weights, ensemble, self.species
             )
         predictions["width"] = width
         predictions["height"] = height

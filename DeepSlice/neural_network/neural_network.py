@@ -12,6 +12,7 @@ from skimage.color import rgb2gray
 import warnings
 import imghdr
 import struct
+import h5py
 
 
 def gray_scale(img: np.ndarray) -> np.ndarray:
@@ -38,8 +39,7 @@ def initialise_network(xception_weights: str, weights: str, species: str) -> Seq
     :rtype: keras.models.Sequential
     """
     base_model = Xception(include_top=True, weights=xception_weights)
-    base_model._layers.pop()
-    base_model._layers.pop()
+    
     if species == "rat":
         inputs = Input(shape=(299, 299, 3))
         base_model_layer = base_model(inputs, training=True)
@@ -55,11 +55,41 @@ def initialise_network(xception_weights: str, weights: str, species: str) -> Seq
         model.add(Dense(9, activation="linear"))
 
     if weights != None:
-        model.load_weights(weights)
+        model = load_xception_weights(model, weights, species)
     return model
 
 
+def load_xception_weights(model, weights, species = "mouse"):
+    with h5py.File(weights, "r") as new:
+        # set weight of each layer manually
+        if species == "mouse":
+            xception_idx = 0
+            dense_idx = 1
+        elif species == "rat":
+            # RatModelInProgress.h5 has an "input_2" layer at index 0, so we need to adjust the indices<
+            xception_idx = 1
+            dense_idx = 2
 
+        model.layers[dense_idx].set_weights([new["dense"]["dense"]["kernel:0"], new["dense"]["dense"]["bias:0"]])
+        model.layers[dense_idx+1].set_weights([new["dense_1"]["dense_1"]["kernel:0"], new["dense_1"]["dense_1"]["bias:0"]])
+        model.layers[dense_idx+2].set_weights([new["dense_2"]["dense_2"]["kernel:0"], new["dense_2"]["dense_2"]["bias:0"]])
+
+        # Set the weights of the xception model 
+        weight_names = new["xception"].attrs["weight_names"].tolist()
+        weight_names_layers = [name.decode("utf-8").split("/")[0] for name in weight_names]
+
+        for i in range(len(model.layers[xception_idx].layers)):
+            name_of_layer = model.layers[xception_idx].layers[i].name
+            # if layer name is in the weight names, then we will set weights
+            if name_of_layer in weight_names_layers:
+                # Get name of weights in the layer
+                layer_weight_names = []
+                for weight in model.layers[xception_idx].layers[i].weights:
+                    layer_weight_names.append(weight.name.split("/")[1])
+                h5_group = new["xception"][name_of_layer]
+                weights_list = [np.array(h5_group[kk]) for kk in layer_weight_names]
+                model.layers[xception_idx].layers[i].set_weights(weights_list)
+    return model 
 
 def load_images_from_path(image_path: str) -> np.ndarray:
     """
@@ -141,6 +171,7 @@ def predictions_util(
     primary_weights: str,
     secondary_weights: str,
     ensemble: bool = False,
+    species : str = "mouse"
 ):
     """
     Predict the image alignments
@@ -152,7 +183,7 @@ def predictions_util(
     :return: The predicted alignments
     :rtype: list
     """
-    model.load_weights(primary_weights)
+    model = load_xception_weights(model, primary_weights, species)
     predictions = model.predict(
         image_generator,
         steps=image_generator.n // image_generator.batch_size,
@@ -161,14 +192,14 @@ def predictions_util(
     predictions = predictions.astype(np.float64)
     if ensemble:
         image_generator.reset()
-        model.load_weights(secondary_weights)
+        model = load_xception_weights(model, secondary_weights, species)
         secondary_predictions = model.predict(
             image_generator,
             steps=image_generator.n // image_generator.batch_size,
             verbose=1,
         )
         predictions = np.mean([predictions, secondary_predictions], axis=0)
-        model.load_weights(primary_weights)
+        model = load_xception_weights(model, primary_weights, species)
     filenames = image_generator.filenames
     filenames = [os.path.basename(i) for i in filenames]
     predictions_df = pd.DataFrame(
