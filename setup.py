@@ -31,7 +31,7 @@ setup(
         'typing',
         'pandas',
         'requests',
-        'protobuf==3.20',
+        'protobuf',
         'lxml',
         'urllib3==1.26.6'
     ],
