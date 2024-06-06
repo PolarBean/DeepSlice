@@ -195,7 +195,4 @@ class DSModel:
         QuickNII_functions.write_QUINT_JSON(
             df=self.predictions, filename=filename, aligner=aligner, target=target
         )
-        QuickNII_functions.write_QuickNII_XML(
-            df=self.predictions, filename=filename, aligner=aligner
-        )
 
