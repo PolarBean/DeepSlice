@@ -105,11 +105,16 @@ def propagate_angles(df, method, species):
     :rtype: pandas.DataFrame
     """
     # get the angles for each section in the dataset
-    DV_angle_list, ML_angle_list = calculate_angles(df)
-    if method == "weighted_mean":
-        depths = calculate_brain_center_depths(
-            df[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]]
-        )
+    temp = df.copy()
+    if "bad_section" in temp:
+        temp = temp[~temp["bad_section"]]
+    DV_angle_list, ML_angle_list = calculate_angles(temp)
+
+
+    depths = calculate_brain_center_depths(
+        temp[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]]
+    )
+
     DV_angle, ML_angle = get_mean_angle(
         DV_angle_list, ML_angle_list, method, depths, species
     )
