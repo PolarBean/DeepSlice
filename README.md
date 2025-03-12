@@ -68,6 +68,7 @@ Model = DSModel(species)
 * Sections in a folder must all be from the same brain
 
 * DeepSlice uses all the sections you select to inform its prediction of section angle. Thus it is important that you do not include sections which lie outside of the Allen Brain Atlas. This include extremely rostral olfactory bulb and caudal medulla. **If you include these sections in your selected folder it will reduce the quality of all the predictions**.
+* If you are not using the web version and would like to include these sections in your alignment, you can now label them as "bad sections" (see below), which will tell DeepSlice not to weight these sections in the propagation.
 
 * The sections do not need to be in any kind of order. 
 
