@@ -107,8 +107,8 @@ Model.enforce_index_order()
 #Furthermore if you know the exact section thickness in microns this can be included instead of None
 #if your sections are numbered rostral to caudal you will need to specify a negative section_thickness      
 Model.enforce_index_spacing(section_thickness = None)
-#now we save which will produce a json file which can be placed in the same directory as your images and
-#then opened with QuickNII. 
+#now we save which will produce a json file which can be placed in the same directory as your images 
+#and then opened with QuickNII. 
 Model.save_predictions(folderpath + 'MyResults')                                                                                                             
 
 
