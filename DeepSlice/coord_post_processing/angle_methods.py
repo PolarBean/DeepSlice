@@ -5,7 +5,7 @@ from .depth_estimation import calculate_brain_center_depths
 
 def calculate_brain_center_coordinate(section, atlas_shape, axis):
     """
-    Calculates the coordinate closest to the middle of the section as defined by the two 
+    Calculates the coordinate closest to the middle of the section as defined by the two
     dimensions not orthogonal to the dimension along which the series is being aligned.
     for example, if the series is being aligned coronally then this will return the midpoint
     in X and Z as coronal series are spaced along the Y coordinate in the CCF.
@@ -39,7 +39,7 @@ def calculate_brain_center_coordinate(section, atlas_shape, axis):
 def calculate_angles(df):
     """
     Calculates the Mediolateral and Dorsoventral angles for a series of predictions
-    
+
     :param df: The dataframe containing the predictions
     :type df: pandas.DataFrame
     :return: a list of calculated ML and DV angles
@@ -107,7 +107,7 @@ def propagate_angles(df, method, species):
     # get the angles for each section in the dataset
     temp = df.copy()
     if "bad_section" in temp:
-        temp = temp[~temp["bad_section"]]
+        temp = temp[~temp["bad_section"].astype(bool)]
     DV_angle_list, ML_angle_list = calculate_angles(temp)
 
 

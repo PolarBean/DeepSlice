@@ -19,7 +19,7 @@ class DSModel:
         xception_weights =   metadata_loader.get_data_path(self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path)
         weights =    metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
         self.model = neural_network.initialise_network(xception_weights, weights, self.species)
-        
+
 
 
     def predict(
@@ -62,7 +62,7 @@ class DSModel:
                 image_directory
             )
         primary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
- 
+
         secondary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["secondary"], self.metadata_path)
 
         if secondary_weights == "None":
@@ -105,7 +105,7 @@ class DSModel:
         """
         sets the bad sections for a given brain. Must be run after predict()
 
-        :param bad_sections: A list of bad sections to ignore when calculating angles and spacing
+        :param bad_sections: A list of bad sections to ignore when calculating angles and spacing, the list just needs to contain a unique string for each section, for instance the section number. do not use a string which appears in multiple filenames
         :type bad_sections: list
         """
         self.predictions = spacing_and_indexing.set_bad_sections_util(
@@ -154,7 +154,7 @@ class DSModel:
             self.predictions = angle_methods.propagate_angles(
                 self.predictions, method, self.species
             )
-            
+
 
     def load_QUINT(self, filename):
         """
@@ -178,9 +178,9 @@ class DSModel:
         self.predictions = predictions
         xception_weights =   metadata_loader.get_data_path(self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path)
         weights =    metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
-        self.model = neural_network.initialise_network(xception_weights, weights, self.species) 
+        self.model = neural_network.initialise_network(xception_weights, weights, self.species)
 
-        
+
 
     def save_predictions(self, filename):
         """

@@ -94,6 +94,10 @@ folderpath = 'examples/example_brain/GLTa/'
 #try with and without ensemble to find the model which best works for you
 #if you have section numbers included in the filename as _sXXX specify this :)
 Model.predict(folderpath, ensemble=True, section_numbers=True)    
+#This is an optional stage if you have damaged sections, or hemibrains they may negatively effect the propagation for the entire dataset
+#simply set the bad sections here using a string which is unique to those each section you would like to label as bad. DeepSlice will
+#not include it in the propagation and instead it will infer its position based on neighbouring sections.
+Model.set_bad_sections(bad_sections=["_s094", "s199"])
 #If you would like to normalise the angles (you should)
 Model.propagate_angles()                     
 #To reorder your sections according to the section numbers 
