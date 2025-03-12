@@ -87,7 +87,7 @@ def get_mean_angle(DV_list, ML_list, method, depths=None, species=None):
             weighted_accuracy = [1.0] * len(df_center)
         df_center = np.array(df_center)
         df_center[df_center < min] = min
-        df_center[df_center > max] = max-1
+        df_center[df_center > max] = max - 1
         weighted_accuracy = [weighted_accuracy[int(y)] for y in df_center]
         DV_angle = np.average(DV_list, weights=weighted_accuracy)
         ML_angle = np.average(ML_list, weights=weighted_accuracy)
@@ -109,7 +109,6 @@ def propagate_angles(df, method, species):
     if "bad_section" in temp:
         temp = temp[~temp["bad_section"].astype(bool)]
     DV_angle_list, ML_angle_list = calculate_angles(temp)
-
 
     depths = calculate_brain_center_depths(
         temp[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]]
@@ -142,4 +141,3 @@ def set_angles(df, DV_angle, ML_angle):
         sections.append(section)
     df[columns] = sections
     return df
-

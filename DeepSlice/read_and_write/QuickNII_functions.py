@@ -103,7 +103,7 @@ def write_QUINT_JSON(
             "height": h,
             "width": w,
             "nr": nr,
-            "markers": marker[0] if len(marker)> 0 else [],
+            "markers": marker[0] if len(marker) > 0 else [],
         }
         for fn, alignment, nr, marker, h, w in zip(
             df.Filenames, alignments, df.nr, markers, df.height, df.width
@@ -125,7 +125,7 @@ def write_QUINT_JSON(
 def read_QUINT_JSON(filename: str) -> pd.DataFrame:
     """
     Converts a QUINT JSON to a pandas dataframe
-    
+
     :param json: The path to the QUINT JSON
     :type json: str
     :return: A pandas dataframe
@@ -149,4 +149,3 @@ def read_QUINT_JSON(filename: str) -> pd.DataFrame:
     df["height"] = height
     df["width"] = width
     return df, target_volume
-

@@ -5,8 +5,6 @@ from .neural_network import neural_network
 from .metadata import metadata_loader
 
 
-
-
 class DSModel:
     def __init__(self, species):
         """Initialises a DeepSlice model for a given species
@@ -16,11 +14,16 @@ class DSModel:
         self.species = species
 
         self.config, self.metadata_path = metadata_loader.load_config()
-        xception_weights =   metadata_loader.get_data_path(self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path)
-        weights =    metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
-        self.model = neural_network.initialise_network(xception_weights, weights, self.species)
-
-
+        xception_weights = metadata_loader.get_data_path(
+            self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path
+        )
+        weights = metadata_loader.get_data_path(
+            self.config["weight_file_paths"][self.species]["primary"],
+            self.metadata_path,
+        )
+        self.model = neural_network.initialise_network(
+            xception_weights, weights, self.species
+        )
 
     def predict(
         self,
@@ -28,8 +31,8 @@ class DSModel:
         ensemble: bool = None,
         section_numbers: bool = True,
         legacy_section_numbers=False,
-        image_list = None,
-        use_secondary_model = False,
+        image_list=None,
+        use_secondary_model=False,
     ):
         """predicts the atlas position for a folder full of histological brain sections
 
@@ -61,27 +64,47 @@ class DSModel:
             image_generator, width, height = neural_network.load_images_from_path(
                 image_directory
             )
-        primary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
+        primary_weights = metadata_loader.get_data_path(
+            self.config["weight_file_paths"][self.species]["primary"],
+            self.metadata_path,
+        )
 
-        secondary_weights = metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["secondary"], self.metadata_path)
+        secondary_weights = metadata_loader.get_data_path(
+            self.config["weight_file_paths"][self.species]["secondary"],
+            self.metadata_path,
+        )
 
         if secondary_weights == "None":
             print(f"ensemble is not available for {self.species}")
             if use_secondary_model:
-                print("WARNING: use_secondary_model is set but no secondary model is available. use_secondary_model will be ignored.")
+                print(
+                    "WARNING: use_secondary_model is set but no secondary model is available. use_secondary_model will be ignored."
+                )
                 use_secondary_model = False
             ensemble = False
         if use_secondary_model and ensemble:
-            print("WARNING: use_secondary_model is set but ensemble is also set. use_secondary_model will be ignored.")
+            print(
+                "WARNING: use_secondary_model is set but ensemble is also set. use_secondary_model will be ignored."
+            )
             use_secondary_model = False
         if use_secondary_model:
             print("Using secondary model")
             predictions = neural_network.predictions_util(
-                self.model, image_generator, secondary_weights,None, ensemble, self.species
+                self.model,
+                image_generator,
+                secondary_weights,
+                None,
+                ensemble,
+                self.species,
             )
         else:
             predictions = neural_network.predictions_util(
-                self.model, image_generator, primary_weights, secondary_weights, ensemble, self.species
+                self.model,
+                image_generator,
+                primary_weights,
+                secondary_weights,
+                ensemble,
+                self.species,
             )
         predictions["width"] = width
         predictions["height"] = height
@@ -90,18 +113,17 @@ class DSModel:
                 predictions["Filenames"], legacy_section_numbers
             )
             predictions["nr"] = predictions["nr"].astype(int)
-            predictions = predictions.sort_values(by = 'nr').reset_index(drop=True)
+            predictions = predictions.sort_values(by="nr").reset_index(drop=True)
         else:
             ###this is just for coronal, change later
-            predictions = predictions.sort_values(by = 'oy').reset_index(drop=True)
-
+            predictions = predictions.sort_values(by="oy").reset_index(drop=True)
 
         #: pd.DataFrame: Filenames and predicted QuickNII coordinates of the input sections.
 
         self.predictions = predictions
         self.image_directory = image_directory
 
-    def set_bad_sections(self, bad_sections: list, auto = False):
+    def set_bad_sections(self, bad_sections: list, auto=False):
         """
         sets the bad sections for a given brain. Must be run after predict()
 
@@ -120,7 +142,9 @@ class DSModel:
             self.predictions
         )
 
-    def enforce_index_spacing(self, section_thickness:Union[int, float] = None, suppress = False):
+    def enforce_index_spacing(
+        self, section_thickness: Union[int, float] = None, suppress=False
+    ):
         """
         Space evenly according to the section indexes, if these indexes do not represent the precise order in which the sections were
         cut, this will lead to less accurate predictions. Section indexes must account for missing sections (ie, if section 3 is missing
@@ -131,7 +155,11 @@ class DSModel:
         """
         voxel_size = self.config["target_volumes"][self.species]["voxel_size_microns"]
         self.predictions = spacing_and_indexing.space_according_to_index(
-            self.predictions, section_thickness = section_thickness, voxel_size = voxel_size, suppress = suppress, species=self.species
+            self.predictions,
+            section_thickness=section_thickness,
+            voxel_size=voxel_size,
+            suppress=suppress,
+            species=self.species,
         )
 
     def adjust_angles(self, ML: Union[int, float], DV: Union[int, float]):
@@ -155,7 +183,6 @@ class DSModel:
                 self.predictions, method, self.species
             )
 
-
     def load_QUINT(self, filename):
         """
         Load a QUINT compatible JSON or XML.
@@ -163,24 +190,29 @@ class DSModel:
         :param filename: the name of the file to load
         :type filename: str
         """
-        if filename.lower().endswith('.json'):
+        if filename.lower().endswith(".json"):
             predictions, target = QuickNII_functions.read_QUINT_JSON(filename)
-            if target == "ABA_Mouse_CCFv3_2017_25um.cutlas" and self.species!='mouse':
-                    self.species = 'mouse'
-                    print('Switching to a mouse model')
-            elif target == "WHS_Rat_v4_39um.cutlas" and self.species!='rat':
-                self.species = 'rat'
+            if target == "ABA_Mouse_CCFv3_2017_25um.cutlas" and self.species != "mouse":
+                self.species = "mouse"
+                print("Switching to a mouse model")
+            elif target == "WHS_Rat_v4_39um.cutlas" and self.species != "rat":
+                self.species = "rat"
                 print("switching to a rat model")
-        elif filename.lower().endswith('.xml'):
+        elif filename.lower().endswith(".xml"):
             predictions = QuickNII_functions.read_QuickNII_XML(filename)
         else:
-            raise ValueError('File must be a JSON or XML')
+            raise ValueError("File must be a JSON or XML")
         self.predictions = predictions
-        xception_weights =   metadata_loader.get_data_path(self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path)
-        weights =    metadata_loader.get_data_path(self.config["weight_file_paths"][self.species]["primary"], self.metadata_path)
-        self.model = neural_network.initialise_network(xception_weights, weights, self.species)
-
-
+        xception_weights = metadata_loader.get_data_path(
+            self.config["weight_file_paths"]["xception_imagenet"], self.metadata_path
+        )
+        weights = metadata_loader.get_data_path(
+            self.config["weight_file_paths"][self.species]["primary"],
+            self.metadata_path,
+        )
+        self.model = neural_network.initialise_network(
+            xception_weights, weights, self.species
+        )
 
     def save_predictions(self, filename):
         """
@@ -189,10 +221,9 @@ class DSModel:
         :param filename: the name of the file to save to
         :type filename: str
         """
-        target  = self.config["target_volumes"][self.species]["name"]
+        target = self.config["target_volumes"][self.species]["name"]
         aligner = self.config["DeepSlice_version"]["prerelease"]
         self.predictions.to_csv(filename + ".csv", index=False)
         QuickNII_functions.write_QUINT_JSON(
             df=self.predictions, filename=filename, aligner=aligner, target=target
         )
-

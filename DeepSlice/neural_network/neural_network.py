@@ -39,7 +39,7 @@ def initialise_network(xception_weights: str, weights: str, species: str) -> Seq
     :rtype: keras.models.Sequential
     """
     base_model = Xception(include_top=True, weights=xception_weights)
-    
+
     if species == "rat":
         inputs = Input(shape=(299, 299, 3))
         base_model_layer = base_model(inputs, training=True)
@@ -59,7 +59,7 @@ def initialise_network(xception_weights: str, weights: str, species: str) -> Seq
     return model
 
 
-def load_xception_weights(model, weights, species = "mouse"):
+def load_xception_weights(model, weights, species="mouse"):
     with h5py.File(weights, "r") as new:
         # set weight of each layer manually
         if species == "mouse":
@@ -70,13 +70,21 @@ def load_xception_weights(model, weights, species = "mouse"):
             xception_idx = 1
             dense_idx = 2
 
-        model.layers[dense_idx].set_weights([new["dense"]["dense"]["kernel:0"], new["dense"]["dense"]["bias:0"]])
-        model.layers[dense_idx+1].set_weights([new["dense_1"]["dense_1"]["kernel:0"], new["dense_1"]["dense_1"]["bias:0"]])
-        model.layers[dense_idx+2].set_weights([new["dense_2"]["dense_2"]["kernel:0"], new["dense_2"]["dense_2"]["bias:0"]])
+        model.layers[dense_idx].set_weights(
+            [new["dense"]["dense"]["kernel:0"], new["dense"]["dense"]["bias:0"]]
+        )
+        model.layers[dense_idx + 1].set_weights(
+            [new["dense_1"]["dense_1"]["kernel:0"], new["dense_1"]["dense_1"]["bias:0"]]
+        )
+        model.layers[dense_idx + 2].set_weights(
+            [new["dense_2"]["dense_2"]["kernel:0"], new["dense_2"]["dense_2"]["bias:0"]]
+        )
 
-        # Set the weights of the xception model 
+        # Set the weights of the xception model
         weight_names = new["xception"].attrs["weight_names"].tolist()
-        weight_names_layers = [name.decode("utf-8").split("/")[0] for name in weight_names]
+        weight_names_layers = [
+            name.decode("utf-8").split("/")[0] for name in weight_names
+        ]
 
         for i in range(len(model.layers[xception_idx].layers)):
             name_of_layer = model.layers[xception_idx].layers[i].name
@@ -89,7 +97,8 @@ def load_xception_weights(model, weights, species = "mouse"):
                 h5_group = new["xception"][name_of_layer]
                 weights_list = [np.array(h5_group[kk]) for kk in layer_weight_names]
                 model.layers[xception_idx].layers[i].set_weights(weights_list)
-    return model 
+    return model
+
 
 def load_images_from_path(image_path: str) -> np.ndarray:
     """
@@ -129,7 +138,8 @@ def load_images_from_path(image_path: str) -> np.ndarray:
             class_mode=None,
         )
     return image_generator, width, height
-    
+
+
 def load_images_from_list(image_list: list) -> np.ndarray:
     """
     Load the images from the given list
@@ -165,17 +175,18 @@ def load_images_from_list(image_list: list) -> np.ndarray:
         )
     return image_generator, width, height
 
+
 def predictions_util(
     model: Sequential,
     image_generator: ImageDataGenerator,
     primary_weights: str,
     secondary_weights: str,
     ensemble: bool = False,
-    species : str = "mouse"
+    species: str = "mouse",
 ):
     """
     Predict the image alignments
-    
+
     :param model: The model to use for prediction
     :param image_generator: The image generator to use for prediction
     :type model: keras.models.Sequential
