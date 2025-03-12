@@ -20,7 +20,7 @@ If you use DeepSlice in your work please cite [Carey et al, 2023](https://www.na
 DeepSlice is fully integrated with the <a href="https://quint-workflow.readthedocs.io/en/latest/QUINTintro.html" >QUINT workflow.</a>  Quint helps you register, segment and quantify brain wide datasets! &nbsp; 🐭🧠🔬💻🤖
 
 ## Web Application
-If you would like to use DeepSlice but don't need your own personal installation, check out [**DeepSlice Flask**](https://www.DeepSlice.com.au), a fully functional web application which will allow you to upload your dataset and download the aligned results. The web interface was developed by [Michael Pegios](https://github.com/ThermoDev/).
+If you would like to use DeepSlice but don't need your own personal installation, check out [**DeepSlice Flask**](https://www.DeepSlice.com.au), a web application which will allow you to upload your dataset and download the aligned results. Some more advanced options are only available in the Python package. The web interface was developed by [Michael Pegios](https://github.com/ThermoDev/).
 ## [Installation: How to install DeepSlice](#installation)
 
 ## [Usage: How to align using DeepSlice](#basic-usage)
