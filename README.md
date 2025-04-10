@@ -16,6 +16,8 @@ DeepSlice automates the process of identifying exactly where in the brain a sect
 ## Citation
 If you use DeepSlice in your work please cite [Carey et al, 2023](https://www.nature.com/articles/s41467-023-41645-4). It may also be useful if you mention the version you use :)
 
+In addition, you should also remember to cite [Wang et al, 2020](https://doi.org/10.1016/j.cell.2020.04.007) if you use the Allen CCFv3 atlas for the Mouse model and [Kleven et al, 2023](https://www.nature.com/articles/s41592-023-02034-3) if you use the Waxholm Atlas of the Sprague Dawley Ratfor the Rat model.
+
 ## Workflow 
 DeepSlice is fully integrated with the <a href="https://quint-workflow.readthedocs.io/en/latest/QUINTintro.html" >QUINT workflow.</a>  Quint helps you register, segment and quantify brain wide datasets! &nbsp; 🐭🧠🔬💻🤖
 
