@@ -58,28 +58,28 @@ def write_QuickNII_XML(df: pd.DataFrame, filename: str, aligner: str) -> None:
     )
 
 
+
 def read_QuickNII_XML(filename: str) -> pd.DataFrame:
     """
     Converts a QuickNII XML to a pandas dataframe
-
-    :param xml: The path to the QuickNII XML
-    :type xml: str
-    :return: A pandas dataframe
-    :rtype: pd.DataFrame
     """
-    df = pd.read_xml(filename)
+    # read raw XML and escape bare &
+    with open(filename, 'r', encoding='utf-8') as f:
+        raw = f.read()
+    # only replace & that aren’t part of &amp; &lt; &gt; &quot; &apos;
+    raw = re.sub(r'&(?!amp;|lt;|gt;|quot;|apos;)', '&amp;', raw)
+    # parse from cleaned string
+    df = pd.read_xml(io.StringIO(raw))
+
     # split the anchoring string into separate columns
     anchoring = df.anchoring.str.split("&", expand=True).values
-    # lambda function to remove non_numeric characters besides '.', we need this as all the 'ox=' etc is still in the strings
-    strip = lambda x: "".join(
-        c for c in x if c.isdigit() or c == "." or c == "-" or c == "e"
-    )
-    ##vectorise the lambda function and apply it to all elements
-    anchoring = np.vectorize(strip)(anchoring)
-    anchoring = anchoring.astype(np.float64)
+    strip = lambda x: "".join(c for c in x if c.isdigit() or c in ".-e")
+    anchoring = np.vectorize(strip)(anchoring).astype(np.float64)
+
     out_df = pd.DataFrame({"Filenames": df.filename})
-    out_df[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]] = anchoring
+    out_df[["ox","oy","oz","ux","uy","uz","vx","vy","vz"]] = anchoring
     return out_df
+
 
 
 def write_QUINT_JSON(
