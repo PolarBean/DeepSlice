@@ -92,7 +92,6 @@ def load_xception_weights(model, weights, species="mouse"):
             if name_of_layer in weight_names_layers:
                 # Get name of weights in the layer
                 layer_weight_names = []
-                print(tf.version.VERSION)
                 for weight in model.layers[xception_idx].layers[i].weights:
                     try:
                         layer_weight_names.append(weight.name.split("/")[1])
