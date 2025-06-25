@@ -92,10 +92,11 @@ def load_xception_weights(model, weights, species="mouse"):
             if name_of_layer in weight_names_layers:
                 # Get name of weights in the layer
                 layer_weight_names = []
+                print(tf.version.VERSION)
                 for weight in model.layers[xception_idx].layers[i].weights:
                     try:
                         layer_weight_names.append(weight.name.split("/")[1])
-                    except:
+                    except IndexError:
                         layer_weight_names.append(f"{weight.name}:0")
 
                 h5_group = new["xception"][name_of_layer]
