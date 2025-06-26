@@ -1,15 +1,29 @@
 from distutils.core import setup
 from setuptools import find_packages
 from pathlib import Path
-
+import subprocess, os
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
+# if GH action hasn’t replaced it, grab the latest tag
+version = os.getenv("DEEPSLICE_VERSION", "{{VERSION_PLACEHOLDER}}")
+if version.startswith("{{"):
+    try:
+        version = (
+            subprocess
+            .check_output(["git", "describe", "--tags", "--abbrev=0"], cwd=this_directory)
+            .decode()
+            .strip()
+        )
+    except Exception:
+        version = "0.0.0"
+
 setup(
     name="DeepSlice",
+    python_requires=">=3.7,<3.13",
     packages=find_packages(),
-    version="{{VERSION_PLACEHOLDER}}",
+    version=version,
     license="GPL-3.0",
     description="A package to align histology to 3D brain atlases",
     long_description=long_description,
@@ -31,7 +45,7 @@ setup(
         "numpy",
         "scikit-learn",
         "scikit-image",
-        "tensorflow<=2.15.0",
+        "tensorflow",
         "h5py",
         "typing",
         "pandas",

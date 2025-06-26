@@ -93,7 +93,11 @@ def load_xception_weights(model, weights, species="mouse"):
                 # Get name of weights in the layer
                 layer_weight_names = []
                 for weight in model.layers[xception_idx].layers[i].weights:
-                    layer_weight_names.append(weight.name.split("/")[1])
+                    try:
+                        layer_weight_names.append(weight.name.split("/")[1])
+                    except IndexError:
+                        layer_weight_names.append(f"{weight.name}:0")
+
                 h5_group = new["xception"][name_of_layer]
                 weights_list = [np.array(h5_group[kk]) for kk in layer_weight_names]
                 model.layers[xception_idx].layers[i].set_weights(weights_list)
