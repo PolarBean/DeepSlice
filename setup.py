@@ -21,6 +21,7 @@ if version.startswith("{{"):
 
 setup(
     name="DeepSlice",
+    python_requires=">=3.7,<3.13",
     packages=find_packages(),
     version=version,
     license="GPL-3.0",
