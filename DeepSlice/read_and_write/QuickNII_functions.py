@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import json
 import numpy as np
 import re
+import io
 
 def write_QuickNII_XML(df: pd.DataFrame, filename: str, aligner: str) -> None:
     """
