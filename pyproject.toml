@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=77", "wheel", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "DeepSlice"
+dynamic = ["version"]
+description = "A package to align histology to 3D brain atlases"
+readme = "README.md"
+requires-python = ">=3.7"
+license = "GPL-3.0-only"
+authors = [{ name = "DeepSlice Team", email = "harry.carey@medisin.uio.no" }]
+keywords = ["histology", "brain", "atlas", "alignment"]
+dependencies = [
+    "numpy",
+    "scikit-learn",
+    "scikit-image",
+    "tensorflow",
+    "h5py",
+    "typing",
+    "pandas",
+    "requests",
+    "protobuf",
+    "lxml",
+    "urllib3==1.26.6",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Programming Language :: Python",
+]
+
+[project.urls]
+Homepage = "https://github.com/PolarBean/DeepSlice"
+Repository = "https://github.com/PolarBean/DeepSlice"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["DeepSlice*"]
+
+[tool.setuptools.package-data]
+DeepSlice = [
+    "metadata/volumes/placeholder.txt",
+    "metadata/config.json",
+    "metadata/weights/*.txt",
+]
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0"
+local_scheme = "no-local-version"
