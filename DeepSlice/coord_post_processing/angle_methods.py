@@ -81,13 +81,13 @@ def get_mean_angle(DV_list, ML_list, method, depths=None, species=None):
             min, max = 0, 528
         elif species == "rat":
             min, max = 0, 1024
+        # the weights are looked up by depth, so there is one weight for every depth
         if len(df_center) > 2:
             weighted_accuracy = plane_alignment.make_gaussian_weights(max)
         else:
-            weighted_accuracy = [1.0] * len(df_center)
-        df_center = np.array(df_center)
-        df_center[df_center < min] = min
-        df_center[df_center > max] = max - 1
+            # with one or two sections, every depth gets the same weight
+            weighted_accuracy = [1.0] * max
+        df_center = np.clip(np.array(df_center, dtype=float), min, max - 1)
         weighted_accuracy = [weighted_accuracy[int(y)] for y in df_center]
         DV_angle = np.average(DV_list, weights=weighted_accuracy)
         ML_angle = np.average(ML_list, weights=weighted_accuracy)
