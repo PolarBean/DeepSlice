@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from DeepSlice import DSModel
 from DeepSlice.coord_post_processing import angle_methods
 from DeepSlice.coord_post_processing.plane_alignment_functions import plane_alignment
 
@@ -58,3 +59,13 @@ def test_propagate_angles_with_all_but_two_sections_bad():
     df["bad_section"] = [True, True, True, False, False]
     out = angle_methods.propagate_angles(df, "weighted_mean", "mouse")
     assert np.isfinite(out[["ox", "oy", "oz", "ux", "uy", "uz", "vx", "vy", "vz"]].to_numpy()).all()
+
+
+def test_adjust_angles_sets_the_ML_and_DV_angles():
+    # adjust_angles only uses the predictions, so the network does not need to be loaded
+    model = DSModel.__new__(DSModel)
+    model.predictions = pd.read_csv(RESULTS)
+    model.adjust_angles(ML=5.0, DV=-3.0)
+    DV, ML = angle_methods.calculate_angles(model.predictions)
+    assert np.allclose(DV, -3.0, atol=0.1)
+    assert np.allclose(ML, 5.0, atol=0.1)
