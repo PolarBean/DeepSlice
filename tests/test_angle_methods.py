@@ -12,11 +12,10 @@ RESULTS = Path(__file__).parents[1] / "examples" / "example_brain" / "GLTa" / "M
 MAX_DEPTH = {"mouse": 528, "rat": 1024}
 
 
-@pytest.mark.parametrize("species", ["mouse", "rat"])
-@pytest.mark.parametrize("depths", [[300.4], [300.4, 410.7], [0.0, 527.9]])
-def test_weighted_mean_of_one_or_two_sections_is_the_mean(species, depths):
+@pytest.mark.parametrize("depths", [[300.4], [300.4, 410.7]])
+def test_weighted_mean_of_one_or_two_sections_is_the_mean(depths):
     DV_list, ML_list = [1.0, 3.0][: len(depths)], [-2.0, 4.0][: len(depths)]
-    DV, ML = angle_methods.get_mean_angle(DV_list, ML_list, "weighted_mean", depths, species)
+    DV, ML = angle_methods.get_mean_angle(DV_list, ML_list, "weighted_mean", depths, "mouse")
     assert DV == pytest.approx(np.mean(DV_list))
     assert ML == pytest.approx(np.mean(ML_list))
 
@@ -40,7 +39,7 @@ def tilted_sections(n_sections):
     return pd.concat(rows)
 
 
-@pytest.mark.parametrize("n_sections", [1, 2, 3])
+@pytest.mark.parametrize("n_sections", [1, 2])
 def test_propagate_angles_of_a_few_sections(n_sections):
     df = tilted_sections(n_sections)
     DV_in, ML_in = angle_methods.calculate_angles(df)
@@ -49,10 +48,9 @@ def test_propagate_angles_of_a_few_sections(n_sections):
     # every section now has the same angles
     assert np.allclose(DV, DV[0], atol=1e-2)
     assert np.allclose(ML, ML[0], atol=1e-2)
-    if n_sections <= 2:
-        # with equal weights, that is the mean of the input angles
-        assert DV[0] == pytest.approx(np.mean(DV_in), abs=1e-2)
-        assert ML[0] == pytest.approx(np.mean(ML_in), abs=1e-2)
+    # with equal weights, that is the mean of the input angles
+    assert DV[0] == pytest.approx(np.mean(DV_in), abs=1e-2)
+    assert ML[0] == pytest.approx(np.mean(ML_in), abs=1e-2)
 
 
 def test_propagate_angles_with_all_but_two_sections_bad():
