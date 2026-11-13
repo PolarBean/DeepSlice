@@ -171,7 +171,9 @@ class DSModel:
         :type ML: [int, float]
         :type DV: [int, float]
         """
-        self.predictions = angle_methods.set_angles(self.predictions, ML, DV)
+        self.predictions = angle_methods.set_angles(
+            self.predictions, DV_angle=DV, ML_angle=ML
+        )
 
     def propagate_angles(self, method="weighted_mean"):
         """
